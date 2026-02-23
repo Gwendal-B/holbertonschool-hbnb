@@ -1,11 +1,8 @@
-from app.models.user import User
+from app.models.amenity import Amenity
 
-def test_user_creation():
-    user = User(first_name="John", last_name="Doe", email="john.doe@example.com")
-    assert user.first_name == "John"
-    assert user.last_name == "Doe"
-    assert user.email == "john.doe@example.com"
-    assert user.is_admin is False  # Default value
-    print("User creation test passed!")
+def test_amenity_creation():
+    amenity = Amenity(name="Wi-Fi")
+    assert amenity.name == "Wi-Fi"
+    print("Amenity creation test passed!")
 
-test_user_creation()
+test_amenity_creation()
