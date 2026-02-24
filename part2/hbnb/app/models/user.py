@@ -8,3 +8,7 @@ class User(BaseModel):
         self.email = email
         self.is_admin = is_admin
         self.password = password
+
+    def add_place(self, place)
+        """Add a place to the user"""
+        self.place.append(place)
