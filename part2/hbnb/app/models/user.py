@@ -11,5 +11,4 @@ class User(BaseModel):
 
     def add_place(self, place):
         """Add a place to the user"""
-        """TEST"""
         self.place.append(place)
