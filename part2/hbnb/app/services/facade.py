@@ -1,6 +1,7 @@
 from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 
+
 class HBnBFacade:
     def __init__(self):
         self.user_repo = InMemoryRepository()
@@ -18,3 +19,18 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
+
+    def get_all_users(self):
+        return self.user_repo.get_all()
+
+    def update_user(self, user_id, user_data):
+        user = self.user_repo.get(user_id)
+        if not user:
+            return None
+
+        if "email" in user_data and user_data["email"] != user.email:
+            if self.get_user_by_email(user_data["email"]):
+                raise ValueError("Email already registered")
+
+        self.user_repo.update(user_id, user_data)
+        return self.user_repo.get(user_id)
