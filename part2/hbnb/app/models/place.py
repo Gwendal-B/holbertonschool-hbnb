@@ -2,6 +2,7 @@ from app.models.base_model import BaseModel
 
 class Place(BaseModel):
     def __init__(self, title, description, price, latitude, longitude, owner):
+        self.validate_place_data(price, latitude, longitude)
         super().__init__()
         self.title = title
         self.description = description
