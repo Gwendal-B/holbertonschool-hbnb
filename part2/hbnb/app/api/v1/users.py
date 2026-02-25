@@ -54,7 +54,10 @@ class UserResource(Resource):
         """Update user information"""
         user_data = api.payload
 
-        updated_user = facade.update_user(user_id, user_data)
+        try:
+            updated_user = facade.update_user(user_id, user_data)
+        except ValueError:
+            return {"error": "Email already registered"}, 400
         if not updated_user:
             return {'error': 'User not found'}, 404
 
