@@ -2,6 +2,7 @@ from app.persistence.repository import InMemoryRepository
 from app.models.user import User
 from app.models.amenity import Amenity
 from app.models.place import Place
+from app.models.review import Review
 
 
 class HBnBFacade:
@@ -83,3 +84,36 @@ class HBnBFacade:
 
     def update_place(self, place_id, place_data):
         return self.place_repo.update(place_id, place_data)
+
+    def create_review(self, review_data):
+        user = self.get_user(review_data['user_id'])
+        place = self.get_place(review_data['place_id'])
+
+        if not user:
+            raise ValueError("User not found")
+        if not place:
+            raise ValueError("Place not found")
+
+        new_review = Review(text=review_data['text'],
+                            rating=review_data['rating'],
+                            place=place, user=user)
+
+        place.reviews.append(new_review.id)
+        user.reviews.append(new_review.id)
+
+        return new_review
+
+    def get_review(self, review_id):
+        return self.review_repo.get(review_id)
+
+    def get_all_reviews(self):
+        return self.review_repo.get_all()
+
+    def get_reviews_by_place(self, place_id):
+        return self.review_repo.get_by_attribute(place_id)
+
+    def update_review(self, review_id, review_data):
+        return self.review_repo.update(review_id, review_data)
+
+    def delete_review(self, review_id):
+        return self.review_repo.delete(review_id)
