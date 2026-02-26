@@ -16,8 +16,7 @@ class Review(BaseModel):
             raise ValueError("Rating must be between 1 and 5")
 
     def update(self, data):
-        new_text = data.get('text', self.text)
-        new_rating = data.get('rating', self.rating)
-        self.validate_rating(new_text, new_rating)
+        if 'rating' in data:
+            self.validate_rating(data['rating'])
         super().update(data)
 

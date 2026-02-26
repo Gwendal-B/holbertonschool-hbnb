@@ -12,4 +12,4 @@ class User(BaseModel):
 
     def add_place(self, place):
         """Add a place to the user"""
-        self.place.append(place)
+        self.places.append(place)

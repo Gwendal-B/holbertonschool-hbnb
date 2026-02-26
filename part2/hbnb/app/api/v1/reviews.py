@@ -71,3 +71,4 @@ class ReviewResource(Resource):
             api.abort(404, "Review not found")
         facade.delete_review(review_id)
         return f"Review {review_id} is deleted", 200
+

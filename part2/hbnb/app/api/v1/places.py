@@ -85,3 +85,25 @@ class PlaceResource(Resource):
         if not updated_place:
             api.abort(404, "Place not found")
         return PlaceList()._marshal_place(updated_place), 200
+
+@api.route('/<place_id>/reviews')
+class PlaceReviewList(Resource):
+    @api.response(200, 'List of reviews for the place retrieved successfully')
+    @api.response(404, 'Place not found')
+    def get(self, place_id):
+        """Get all reviews for a specific place"""
+        place = facade.get_place(place_id)
+        if not place:
+            api.abort(404, "Place not found")
+
+        reviews = facade.get_reviews_by_place(place_id)
+        return [self._marshal_review(r) for r in reviews], 200
+
+    def _marshal_review(self, review):
+        return {
+            "id": review.id,
+            "text": review.text,
+            "rating": review.rating,
+            "user_id": review.user.id,
+            "place_id": review.place.id
+        }
