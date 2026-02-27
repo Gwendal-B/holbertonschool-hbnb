@@ -163,6 +163,24 @@ Supports retrieving all reviews for a specific place.
 
 # Testing
 
+The API was extensively tested using **Postman** with a complete dedicated collection.
+
+## Postman Collection
+
+A full Postman workspace was create in order to test:
+
+It includes:
+
+- All endpoints (Users, Amenities, Places, Reviews)
+- Positive and negative test cases
+- Automatic ID propagation via environment variables
+- Validation of:
+  - Status codes
+  - JSON structure
+  - UUID format
+  - Business constraints
+  - Relationship integrity
+
 - cURL testing
 - Swagger documentation (flask-restx)
 - Validation checks
