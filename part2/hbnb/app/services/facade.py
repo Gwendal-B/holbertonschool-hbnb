@@ -45,6 +45,9 @@ class HBnBFacade:
 
     def get_amenity(self, amenity_id):
         return self.amenity_repo.get(amenity_id)
+    
+    def get_amenity_by_name(self, name):
+        return self.amenity_repo.get_by_attribute('name', name)
 
     def get_all_amenities(self):
         return self.amenity_repo.get_all()
