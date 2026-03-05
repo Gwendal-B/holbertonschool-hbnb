@@ -27,26 +27,7 @@ place_model = api.model('Place', {
     'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
 })
 
-@api.route('/')
-class PlaceList(Resource):
-    @api.expect(place_model)
-    @api.response(201, 'Place successfully created')
-    @api.response(400, 'Invalid input data')
-    def post(self):
-        """Register a new place"""
-        try:
-            new_place = facade.create_place(api.payload)
-            return self._marshal_place(new_place), 201
-        except ValueError as e:
-            return {"error": str(e)}, 400
-
-    @api.response(200, 'List of places retrieved successfully')
-    def get(self):
-        """Retrieve a list of all places"""
-        places = facade.get_all_places()
-        return [self._marshal_place(p) for p in places], 200
-
-    def _marshal_place(self, place):
+def marshal_place(self, place):
         """Helper pour transformer l'objet Place en dictionnaire JSON propre"""
         return {
             "id": place.id,
@@ -64,6 +45,25 @@ class PlaceList(Resource):
             "amenities": [{"id": a.id, "name": a.name} for a in place.amenities]
         }
 
+@api.route('/')
+class PlaceList(Resource):
+    @api.expect(place_model)
+    @api.response(201, 'Place successfully created')
+    @api.response(400, 'Invalid input data')
+    def post(self):
+        """Register a new place"""
+        try:
+            new_place = facade.create_place(api.payload)
+            return marshal_place(new_place), 201
+        except ValueError as e:
+            return {"error": str(e)}, 400
+
+    @api.response(200, 'List of places retrieved successfully')
+    def get(self):
+        """Retrieve a list of all places"""
+        places = facade.get_all_places()
+        return [marshal_place(p) for p in places], 200
+
 @api.route('/<place_id>')
 class PlaceResource(Resource):
     @api.response(200, 'Place details retrieved successfully')
@@ -73,7 +73,7 @@ class PlaceResource(Resource):
         place = facade.get_place(place_id)
         if not place:
             api.abort(404, "Place not found")
-        return PlaceList()._marshal_place(place), 200
+        return marshal_place(place), 200
 
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
@@ -84,7 +84,7 @@ class PlaceResource(Resource):
         updated_place = facade.update_place(place_id, api.payload)
         if not updated_place:
             api.abort(404, "Place not found")
-        return PlaceList()._marshal_place(updated_place), 200
+        return marshal_place(updated_place), 200
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewList(Resource):
@@ -97,13 +97,10 @@ class PlaceReviewList(Resource):
             api.abort(404, "Place not found")
 
         reviews = facade.get_reviews_by_place(place_id)
-        return [self._marshal_review(r) for r in reviews], 200
-
-    def _marshal_review(self, review):
-        return {
-            "id": review.id,
-            "text": review.text,
-            "rating": review.rating,
-            "user_id": review.user.id,
-            "place_id": review.place.id
-        }
+        return [{
+            "id": r.id,
+            "text": r.text,
+            "rating": r.rating,
+            "user_id": r.user.id,
+            "place_id": r.place.id
+        } for r in reviews], 200
