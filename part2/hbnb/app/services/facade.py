@@ -56,7 +56,7 @@ class HBnBFacade:
         amenity = self.amenity_repo.get(amenity_id)
         if not amenity:
             return None
-        self.amenity_repo.udpate(amenity_id, amenity_data)
+        self.amenity_repo.update(amenity_id, amenity_data)
         return self.amenity_repo.get(amenity_id)
 
     def create_place(self, place_data):
@@ -128,7 +128,7 @@ class HBnBFacade:
         review = self.review_repo.get(review_id)
         if not review:
             return None
-        review.udpate(review_data)
+        review.update(review_data)
         return self.review_repo.get(review_id)
 
     def delete_review(self, review_id):
