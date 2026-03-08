@@ -21,7 +21,7 @@ class User(BaseModel):
         if max_len and len(str(value)) > max_len:
             raise ValueError(f"'{field_name}' must not exceed {max_len} characters")
         return value
-    
+
     @staticmethod
     def _validate_email(email):
         if not email or not str(email).strip():
