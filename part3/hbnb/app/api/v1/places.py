@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 api = Namespace('places', description='Place operations')
 
@@ -47,22 +48,33 @@ def marshal_place(place):
 
 @api.route('/')
 class PlaceList(Resource):
-    @api.expect(place_model)
-    @api.response(201, 'Place successfully created')
-    @api.response(400, 'Invalid input data')
-    def post(self):
-        """Register a new place"""
-        try:
-            new_place = facade.create_place(api.payload)
-            return marshal_place(new_place), 201
-        except ValueError as e:
-            return {"error": str(e)}, 400
-
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
         """Retrieve a list of all places"""
         return [marshal_place(p) for p in facade.get_all_places()], 200
 
+    @jwt_required()
+    @api.doc(security='BearerAuth')
+    @api.expect(place_model)
+    @api.response(201, 'Place successfully created')
+    @api.response(400, 'Invalid input data')
+    @api.response(401, 'Authentication required')
+    @api.response(403, 'Unauthorized action')
+    def post(self):
+        """Register a new place"""
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+        data = api.payload
+
+        # L'owner_id doit correspondre à l'utilisateur connecté (sauf admin)
+        if data.get('owner_id') != current_user_id and not claims.get('is_admin', False):
+            return {'error': 'Unauthorized action — owner_id must match your user ID'}, 403
+
+        try:
+            new_place = facade.create_place(api.payload)
+            return marshal_place(new_place), 201
+        except ValueError as e:
+            return {"error": str(e)}, 400
 
 @api.route('/<place_id>')
 class PlaceResource(Resource):
@@ -75,12 +87,26 @@ class PlaceResource(Resource):
             api.abort(404, "Place not found")
         return marshal_place(place), 200
 
+    @jwt_required()
+    @api.doc(security='BearerAuth')
     @api.expect(place_model)
     @api.response(200, 'Place updated successfully')
-    @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @api.response(401, 'Authentication required')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Place not found')
     def put(self, place_id):
         """Update a place's information"""
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+
+        place = facade.get_place(place_id)
+        if not place:
+            api.abort(404, "Place not found")
+
+        if place.owner.id != current_user_id and not claims.get('is_admin', False)
+            return {'error': 'Unauthorized action'}, 403
+
         try:
             updated_place = facade.update_place(place_id, api.payload)
         except ValueError as e:
