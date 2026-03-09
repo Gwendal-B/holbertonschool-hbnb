@@ -104,7 +104,7 @@ class PlaceResource(Resource):
         if not place:
             api.abort(404, "Place not found")
 
-        if place.owner.id != current_user_id and not claims.get('is_admin', False)
+        if place.owner.id != current_user_id and not claims.get('is_admin', False):
             return {'error': 'Unauthorized action'}, 403
 
         try:
