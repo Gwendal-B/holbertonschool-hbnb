@@ -1,26 +1,26 @@
 from flask_restx import Namespace, Resource, fields
-from app.services import facade
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
 
 review_model = api.model('Review', {
-    'text': fields.String(required=True, description='Text of the review'),
-    'rating': fields.Integer(required=True, description='Rating of the place (1-5)'),
-    'user_id': fields.String(required=True, description='ID of the user'),
-    'place_id': fields.String(required=True, description='ID of the place')
+    'text':     fields.String(required=True,  description='Text of the review'),
+    'rating':   fields.Integer(required=True, description='Rating of the place (1-5)'),
+    'user_id':  fields.String(required=True,  description='ID of the user'),
+    'place_id': fields.String(required=True,  description='ID of the place')
 })
 
 
 def marshal_review(review):
-    """Sérialise un objet Review en dict JSON."""
     return {
-        "id": review.id,
-        "text": review.text,
-        "rating": review.rating,
-        "user_id": review.user.id,
+        "id":       review.id,
+        "text":     review.text,
+        "rating":   review.rating,
+        "user_id":  review.user.id,
         "place_id": review.place.id
     }
+
 
 def validate_review_payload(data):
     if not data:
@@ -39,7 +39,7 @@ def validate_review_payload(data):
 class ReviewList(Resource):
     @api.response(200, 'List of reviews retrieved successfully')
     def get(self):
-        """Retrieve a list of all reviews"""
+        """Retrieve all reviews (public)"""
         return [marshal_review(r) for r in facade.get_all_reviews()], 200
 
     @jwt_required()
@@ -50,7 +50,7 @@ class ReviewList(Resource):
     @api.response(401, 'Authentication required')
     @api.response(403, 'Unauthorized action')
     def post(self):
-        """Register a new review"""
+        """Create a review — authenticated users only, user_id must match token"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
         data = api.payload
@@ -62,6 +62,19 @@ class ReviewList(Resource):
         # user_id doit correspondre à l'utilisateur connecté (sauf admin)
         if data.get('user_id') != current_user_id and not claims.get('is_admin', False):
             return {'error': 'Unauthorized action — user_id must match your user ID'}, 403
+
+        place_id = data.get('place_id')
+
+        # Interdit de reviewer sa propre place
+        place = facade.get_place(place_id)
+        if not place:
+            return {"error": "Place not found"}, 404
+        if place.owner.id == current_user_id:
+            return {"error": "You cannot review your own place"}, 400
+
+        # Interdit de reviewer deux fois la même place
+        if facade.get_review_by_user_and_place(current_user_id, place_id):
+            return {"error": "You have already reviewed this place"}, 400
 
         try:
             new_review = facade.create_review(data)
@@ -75,7 +88,7 @@ class ReviewResource(Resource):
     @api.response(200, 'Review details retrieved successfully')
     @api.response(404, 'Review not found')
     def get(self, review_id):
-        """Get review details by ID"""
+        """Get review by ID (public)"""
         review = facade.get_review(review_id)
         if not review:
             api.abort(404, "Review not found")
@@ -90,7 +103,7 @@ class ReviewResource(Resource):
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'Review not found')
     def put(self, review_id):
-        """Update a review's information"""
+        """Update a review — only the author or admin"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
 

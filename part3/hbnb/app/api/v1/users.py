@@ -9,7 +9,7 @@ email_validation = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 
 def validate_user_payload(data, require_password=True):
-    """Valide les champs obligatoires. Retourne un message d'erreur ou None."""
+    """Valide les champs obligatoires pour la création. Retourne un message d'erreur ou None."""
     if not data:
         return "Payload is empty"
     for field in ('first_name', 'last_name', 'email'):
@@ -25,30 +25,52 @@ def validate_user_payload(data, require_password=True):
     return None
 
 
-# Modèle d'entrée
+def validate_user_update_payload(data):
+    """Valide le payload de mise à jour (first_name, last_name uniquement)."""
+    if not data:
+        return "Payload is empty"
+    # email et password ne peuvent pas être modifiés via ce endpoint
+    if 'email' in data:
+        return "You cannot modify your email"
+    if 'password' in data:
+        return "You cannot modify your password"
+    for field in ('first_name', 'last_name'):
+        value = data.get(field)
+        if value is not None and not str(value).strip():
+            return f"'{field}' cannot be empty"
+    return None
+
+
+# Modèle d'entrée pour la création (inclut email + password)
 user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
-    'last_name': fields.String(required=True, description='Last name of the user'),
-    'email': fields.String(required=True, description='Email of the user'),
-    'password': fields.String(required=True, description='Password of the user')
+    'last_name':  fields.String(required=True, description='Last name of the user'),
+    'email':      fields.String(required=True, description='Email of the user'),
+    'password':   fields.String(required=True, description='Password of the user')
 })
 
-# Modèle de sortie
-user_response_model = api.model('UserResponse', {
-    'id': fields.String(description='User ID'),
+# Modèle d'entrée pour la mise à jour (first_name et last_name seulement)
+user_update_model = api.model('UserUpdate', {
     'first_name': fields.String(description='First name of the user'),
-    'last_name': fields.String(description='Last name of the user'),
-    'email': fields.String(description='Email of the user')
+    'last_name':  fields.String(description='Last name of the user')
+})
+
+# Modèle de sortie (sans password)
+user_response_model = api.model('UserResponse', {
+    'id':         fields.String(description='User ID'),
+    'first_name': fields.String(description='First name of the user'),
+    'last_name':  fields.String(description='Last name of the user'),
+    'email':      fields.String(description='Email of the user')
 })
 
 
 def user_to_dict(user):
-    """Sérialise un User sans exposer le password."""
+    """Sérialise un User SANS exposer le password."""
     return {
-        'id': user.id,
+        'id':         user.id,
         'first_name': user.first_name,
-        'last_name': user.last_name,
-        'email': user.email
+        'last_name':  user.last_name,
+        'email':      user.email
     }
 
 
@@ -58,7 +80,7 @@ class UserList(Resource):
     @api.response(201, 'User successfully created', user_response_model)
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new user"""
+        """Register a new user (public endpoint)"""
         user_data = api.payload
 
         error = validate_user_payload(user_data, require_password=True)
@@ -77,7 +99,7 @@ class UserList(Resource):
 
     @api.response(200, 'List of users retrieved successfully')
     def get(self):
-        """Retrieve a list of all users — password not included"""
+        """Retrieve a list of all users (public endpoint)"""
         return [user_to_dict(u) for u in facade.get_all_users()], 200
 
 
@@ -86,7 +108,7 @@ class UserResource(Resource):
     @api.response(200, 'User details retrieved successfully', user_response_model)
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get user details by ID — password not included"""
+        """Get user details by ID (public endpoint)"""
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -94,14 +116,14 @@ class UserResource(Resource):
 
     @jwt_required()
     @api.doc(security='BearerAuth')
-    @api.expect(user_model, validate=True)
+    @api.expect(user_update_model, validate=True)
     @api.response(200, 'User successfully updated', user_response_model)
-    @api.response(400, 'Invalid input data')
+    @api.response(400, 'Invalid input data — email and password cannot be modified')
     @api.response(401, 'Authentication required')
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'User not found')
     def put(self, user_id):
-        """Update user information"""
+        """Update user first/last name — email and password cannot be changed here"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
 
@@ -111,7 +133,7 @@ class UserResource(Resource):
 
         user_data = api.payload
 
-        error = validate_user_payload(user_data, require_password=False)
+        error = validate_user_update_payload(user_data)
         if error:
             return {'error': error}, 400
 
