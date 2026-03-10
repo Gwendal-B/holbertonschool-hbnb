@@ -39,6 +39,7 @@ def validate_user_update_payload(data):
             return f"'{field}' cannot be empty"
     return None
 
+
 def validate_admin_update_payload(data):
     """Valide le payload de mise à jour (first_name, last_name)."""
     if not data:
@@ -58,6 +59,7 @@ def validate_admin_update_payload(data):
         if value is not None and not str(value).strip():
             return f"'{field}' cannot be empty"
     return None
+
 
 # Modèle d'entrée pour la création (inclut email + password)
 user_model = api.model('User', {
@@ -114,7 +116,7 @@ class UserList(Resource):
 
         if not claims.get('is_admin'):
             return {'error': 'Admin privileges required'}, 403
-        
+
         error = validate_user_payload(user_data, require_password=True)
         if error:
             return {'error': error}, 400
@@ -168,9 +170,9 @@ class UserResource(Resource):
 
         if is_admin:
             error = validate_admin_update_payload(user_data)
-        else: 
+        else:
             error = validate_user_update_payload(user_data)
-            
+
         if error:
             return {'error': error}, 400
 
@@ -182,5 +184,3 @@ class UserResource(Resource):
             return {'error': 'User not found'}, 404
 
         return user_to_dict(updated_user), 200
-
-
