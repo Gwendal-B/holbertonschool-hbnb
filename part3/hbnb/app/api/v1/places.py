@@ -76,6 +76,7 @@ class PlaceList(Resource):
         except ValueError as e:
             return {"error": str(e)}, 400
 
+
 @api.route('/<place_id>')
 class PlaceResource(Resource):
     @api.response(200, 'Place details retrieved successfully')
@@ -114,6 +115,7 @@ class PlaceResource(Resource):
         if not updated_place:
             api.abort(404, "Place not found")
         return marshal_place(updated_place), 200
+
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewList(Resource):
