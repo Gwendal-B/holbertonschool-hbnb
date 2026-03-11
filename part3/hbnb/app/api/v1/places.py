@@ -116,6 +116,28 @@ class PlaceResource(Resource):
             api.abort(404, "Place not found")
         return marshal_place(updated_place), 200
 
+    
+    @jwt_required()
+    @api.doc(security='BearerAuth')
+    @api.response(200, 'Place deleted successfully')
+    @api.response(401, 'Authentication required')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Place not found')
+    def delete(self, place_id):
+        """Delete a place — only the owner or admin"""
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+
+        place = facade.get_place(place_id)
+        if not place:
+            api.abort(404, "Place not found")
+
+        if place.owner.id != current_user_id and not claims.get('is_admin', False):
+            return {'error': 'Unauthorized action'}, 403
+
+        facade.delete_place(place_id)
+        return {"message": f"Place {place_id} deleted"}, 200
+
 
 @api.route('/<place_id>/reviews')
 class PlaceReviewList(Resource):

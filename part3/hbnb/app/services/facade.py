@@ -115,6 +115,9 @@ class HBnBFacade:
             return None
         place.update(place_data)
         return self.place_repo.get(place_id)
+    
+    def delete_place(self, place_id):
+        return self.place_repo.delete(place_id)
 
     # ------------------------------------------------------------------ #
     #  Reviews
