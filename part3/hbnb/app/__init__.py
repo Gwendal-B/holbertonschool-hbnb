@@ -22,9 +22,10 @@ def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # Initialise Flask-Bcrypt avec l'app et initialise JWT manager
+    # Initialise Flask-Bcrypt avec l'app et initialise JWT manager mais aussi la database
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
 
     api = Api(app, version='1.0', title='HBnB API',
               description='HBnB Application API', doc='/api/v1/')
