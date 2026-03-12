@@ -3,7 +3,7 @@ from datetime import datetime
 from app import db
 
 
-class BaseModel:
+class BaseModel(db.Model):
 
     # This ensures SQLAlchemy does not create a table for BaseModel
     __abstract__ = True

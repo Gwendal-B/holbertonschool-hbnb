@@ -23,7 +23,6 @@ class User(BaseModel):
         self.email = self._validate_email(email)
         self.is_admin = is_admin  # False par défaut
         self.hash_password(password)
-        self.places = []
 
     @staticmethod
     def _validate_non_empty(value, field_name, max_len=None):
@@ -51,7 +50,3 @@ class User(BaseModel):
     def verify_password(self, password):
         """Verifies if the provided password matches the hashed password."""
         return bcrypt.check_password_hash(self.password, password)
-
-    def add_place(self, place):
-        """Add a place to the user"""
-        self.places.append(place)

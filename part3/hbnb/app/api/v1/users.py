@@ -1,6 +1,6 @@
 import re
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 from app.services import facade
 
 api = Namespace('users', description='User operations')
@@ -8,35 +8,30 @@ api = Namespace('users', description='User operations')
 email_validation = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 
-def validate_user_payload(data, require_password=True):
-    """
-    Valide les champs obligatoires pour la création.
-    Retourne un message d'erreur ou None.
-    """
+# ---------------------------------------------------------------------------
+# Validation helpers
+# ---------------------------------------------------------------------------
+
+def validate_create_payload(data):
     if not data:
         return "Payload is empty"
-    for field in ('first_name', 'last_name', 'email'):
+    for field in ('first_name', 'last_name', 'email', 'password'):
         value = data.get(field)
         if not value or not str(value).strip():
             return f"'{field}' is required and cannot be empty"
-    if require_password:
-        password = data.get('password')
-        if not password or not str(password).strip():
-            return "'password' is required and cannot be empty"
     if not email_validation.match(data['email']):
         return "Invalid email format"
     return None
 
 
-def validate_user_update_payload(data):
-    """Valide le payload de mise à jour (first_name, last_name uniquement)."""
+def validate_self_update_payload(data):
+    """Utilisateur normal — uniquement first/last name."""
     if not data:
         return "Payload is empty"
-    # email et password ne peuvent pas être modifiés via ce endpoint
     if 'email' in data:
-        return "You cannot modify your email"
+        return "You cannot modify your email address"
     if 'password' in data:
-        return "You cannot modify your password"
+        return "You cannot modify your password here"
     for field in ('first_name', 'last_name'):
         value = data.get(field)
         if value is not None and not str(value).strip():
@@ -45,18 +40,16 @@ def validate_user_update_payload(data):
 
 
 def validate_admin_update_payload(data):
-    """Valide le payload de mise à jour (first_name, last_name)."""
+    """Admin — email et password autorisés."""
     if not data:
         return "Payload is empty"
     if 'email' in data:
-        email = data["email"]
+        if not data['email'] or not str(data['email']).strip():
+            return "'email' cannot be empty"
         if not email_validation.match(data['email']):
             return "Invalid email format"
-        if not str(email).strip():
-            return "'email' cannot be empty"
     if 'password' in data:
-        password = data["password"]
-        if not str(password).strip():
+        if not data['password'] or not str(data['password']).strip():
             return "'password' cannot be empty"
     for field in ('first_name', 'last_name'):
         value = data.get(field)
@@ -65,40 +58,40 @@ def validate_admin_update_payload(data):
     return None
 
 
-# Modèle d'entrée pour la création (inclut email + password)
+# ---------------------------------------------------------------------------
+# API models
+# ---------------------------------------------------------------------------
+
+# Création — is_admin optionnel (ignoré si le requêteur n'est pas admin)
 user_model = api.model('User', {
-    'first_name': fields.String(
-        required=True, description='First name of the user'),
-    'last_name': fields.String(
-        required=True, description='Last name of the user'),
-    'email': fields.String(
-        required=True, description='Email of the user'),
-    'password': fields.String(
-        required=True, description='Password of the user'),
-    'is_admin': fields.Boolean(
-        required=True, description='Status admin of the user'),
+    'first_name': fields.String(required=True,  description='First name'),
+    'last_name':  fields.String(required=True,  description='Last name'),
+    'email':      fields.String(required=True,  description='Email address'),
+    'password':   fields.String(required=True,  description='Password'),
+    'is_admin':   fields.Boolean(default=False,
+                                 description='Admin flag — only honoured when sent by an admin'),
 })
 
-# Modèle d'entrée pour la mise à jour (first_name et last_name seulement)
+# Mise à jour par l'utilisateur lui-même (first/last name seulement)
 user_update_model = api.model('UserUpdate', {
-    'first_name': fields.String(description='First name of the user'),
-    'last_name':  fields.String(description='Last name of the user')
+    'first_name': fields.String(description='First name'),
+    'last_name':  fields.String(description='Last name'),
 })
 
-# Modèle d'entrée pour la mise à jour admin
-admin_update_model = api.model('UserUpdate', {
-    'first_name': fields.String(description='First name of the user'),
-    'last_name':  fields.String(description='Last name of the user'),
-    'email':      fields.String(description='Email of the user'),
-    'password':   fields.String(description='Password of the user')
+# Mise à jour complète par un admin (email + password inclus)
+admin_update_model = api.model('AdminUserUpdate', {
+    'first_name': fields.String(description='First name'),
+    'last_name':  fields.String(description='Last name'),
+    'email':      fields.String(description='Email address'),
+    'password':   fields.String(description='New password (will be hashed)'),
 })
 
-# Modèle de sortie (sans password)
+# Réponse (jamais de password)
 user_response_model = api.model('UserResponse', {
     'id':         fields.String(description='User ID'),
-    'first_name': fields.String(description='First name of the user'),
-    'last_name':  fields.String(description='Last name of the user'),
-    'email':      fields.String(description='Email of the user')
+    'first_name': fields.String(description='First name'),
+    'last_name':  fields.String(description='Last name'),
+    'email':      fields.String(description='Email address'),
 })
 
 
@@ -108,25 +101,44 @@ def user_to_dict(user):
         'id':         user.id,
         'first_name': user.first_name,
         'last_name':  user.last_name,
-        'email':      user.email
+        'email':      user.email,
     }
 
 
+# ---------------------------------------------------------------------------
+# Routes
+# ---------------------------------------------------------------------------
+
 @api.route('/')
 class UserList(Resource):
-    @jwt_required()
+
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created', user_response_model)
     @api.response(400, 'Invalid input data')
     def post(self):
-        """Register a new user (public endpoint)"""
-        user_data = api.payload
-        claims = get_jwt()
+        """Register a new user.
 
-        if not claims.get('is_admin'):
-            return {'error': 'Admin privileges required'}, 403
+        - **Public / regular users**: `is_admin` is ignored — always set to False.
+        - **Admins** (valid JWT with `is_admin: true`): can pass `is_admin=True`
+          to create another administrator.
+        """
+        user_data = dict(api.payload)
 
-        error = validate_user_payload(user_data, require_password=True)
+        # Vérifie si le requêteur est un admin authentifié (token optionnel)
+        caller_is_admin = False
+        try:
+            verify_jwt_in_request(optional=True)
+            claims = get_jwt()
+            caller_is_admin = bool(claims.get('is_admin', False))
+        except Exception:
+            pass  # Pas de token ou token invalide → traité comme public
+
+        if not caller_is_admin:
+            # Un utilisateur normal ne peut pas se définir admin
+            user_data.pop('is_admin', None)
+            user_data['is_admin'] = False
+
+        error = validate_create_payload(user_data)
         if error:
             return {'error': error}, 400
 
@@ -142,18 +154,17 @@ class UserList(Resource):
 
     @api.response(200, 'List of users retrieved successfully')
     def get(self):
-        """Retrieve a list of all users (public endpoint)"""
+        """Retrieve all users (public)."""
         return [user_to_dict(u) for u in facade.get_all_users()], 200
 
 
 @api.route('/<user_id>')
 class UserResource(Resource):
-    @api.response(
-        200, 'User details retrieved successfully', user_response_model
-    )
+
+    @api.response(200, 'User details retrieved successfully', user_response_model)
     @api.response(404, 'User not found')
     def get(self, user_id):
-        """Get user details by ID (public endpoint)"""
+        """Get user details by ID (public)."""
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
@@ -161,30 +172,32 @@ class UserResource(Resource):
 
     @jwt_required()
     @api.doc(security='BearerAuth')
-    @api.expect(user_update_model, validate=True)
     @api.response(200, 'User successfully updated', user_response_model)
-    @api.response(400, 'Invalid input data - email and password '
-                       'cannot be modified')
+    @api.response(400, 'Invalid input data')
     @api.response(401, 'Authentication required')
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'User not found')
     def put(self, user_id):
-        """Update user first/last name — email and password cannot be
-        changed here"""
+        """Update a user.
+
+        - **Regular users**: only first/last name. Email and password cannot be changed.
+        - **Admins**: can update any user, including email and password.
+        """
         current_user_id = get_jwt_identity()
         claims = get_jwt()
-
         is_admin = claims.get('is_admin', False)
-        # Seul l'utilisateur lui-même ou un admin peut modifier
+
         if current_user_id != user_id and not is_admin:
             return {'error': 'Unauthorized action'}, 403
 
-        user_data = api.payload
+        user_data = dict(api.payload)
+        # is_admin ne peut pas être changé via ce endpoint
+        user_data.pop('is_admin', None)
 
         if is_admin:
             error = validate_admin_update_payload(user_data)
         else:
-            error = validate_user_update_payload(user_data)
+            error = validate_self_update_payload(user_data)
 
         if error:
             return {'error': error}, 400
@@ -192,7 +205,8 @@ class UserResource(Resource):
         try:
             updated_user = facade.update_user(user_id, user_data)
         except ValueError as e:
-            return {"error": str(e)}, 400
+            return {'error': str(e)}, 400
+
         if not updated_user:
             return {'error': 'User not found'}, 404
 
