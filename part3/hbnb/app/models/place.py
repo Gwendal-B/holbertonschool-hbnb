@@ -1,6 +1,14 @@
 from app.models.base_model import BaseModel
 from app import db
 
+# Table d'association many-to-many entre Place et Amenity
+place_amenity = db.Table(
+    'place_amenity',
+    db.Column('place_id',   db.String(36), db.ForeignKey('places.id'),   primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+)
+
+
 class Place(BaseModel):
     __tablename__ = 'places'
 
@@ -12,9 +20,23 @@ class Place(BaseModel):
     owner_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
 
     # Relations
-    owner = db.Relationship(db.String(50), db.ForeignKey('owner.name'), nullable=False)
-    reviews = db.Relationship(db.String(50), db.ForeignKey('review.name'), nullable=False)
-    amenities = db.Relationship(db.String(50), db.ForeignKey('amenity.name'), nullable=False)
+    owner = db.relationship(
+        'User',
+        back_populates='places',
+        lazy='select'
+    )
+    reviews = db.relationship(
+        'Review',
+        back_populates='place',
+        cascade='all, delete-orphan',
+        lazy='select'
+    )
+    amenities = db.relationship(
+        'Amenity',
+        secondary=place_amenity,
+        lazy='subquery',
+        backref=db.backref('places', lazy=True)
+    )
 
     def __init__(self, title, description, price, latitude, longitude, owner):
         self._validate_title(title)
