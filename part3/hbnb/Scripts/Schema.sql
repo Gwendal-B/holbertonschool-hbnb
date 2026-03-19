@@ -1,9 +1,8 @@
 -- =============================================================================
 -- HBnB — Database Schema
--- Compatible: MySQL / SQLite
+-- Compatible : MySQL / SQLite
 -- =============================================================================
 
--- Drop tables in reverse dependency order
 DROP TABLE IF EXISTS place_amenity;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS places;
@@ -19,15 +18,19 @@ CREATE TABLE users (
     last_name  VARCHAR(255) NOT NULL,
     email      VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
-    is_admin   BOOLEAN      NOT NULL DEFAULT FALSE
+    is_admin   BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at DATETIME     NOT NULL,
+    updated_at DATETIME     NOT NULL
 );
 
 -- =============================================================================
 -- TABLE: amenities
 -- =============================================================================
 CREATE TABLE amenities (
-    id   CHAR(36)     NOT NULL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE
+    id         CHAR(36)     NOT NULL PRIMARY KEY,
+    name       VARCHAR(255) NOT NULL UNIQUE,
+    created_at DATETIME     NOT NULL,
+    updated_at DATETIME     NOT NULL
 );
 
 -- =============================================================================
@@ -41,6 +44,8 @@ CREATE TABLE places (
     latitude    FLOAT          NOT NULL,
     longitude   FLOAT          NOT NULL,
     owner_id    CHAR(36)       NOT NULL,
+    created_at  DATETIME       NOT NULL,
+    updated_at  DATETIME       NOT NULL,
     FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
@@ -48,11 +53,13 @@ CREATE TABLE places (
 -- TABLE: reviews
 -- =============================================================================
 CREATE TABLE reviews (
-    id       CHAR(36) NOT NULL PRIMARY KEY,
-    text     TEXT     NOT NULL,
-    rating   INT      NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    user_id  CHAR(36) NOT NULL,
-    place_id CHAR(36) NOT NULL,
+    id         CHAR(36) NOT NULL PRIMARY KEY,
+    text       TEXT     NOT NULL,
+    rating     INT      NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    user_id    CHAR(36) NOT NULL,
+    place_id   CHAR(36) NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
     FOREIGN KEY (user_id)  REFERENCES users(id),
     FOREIGN KEY (place_id) REFERENCES places(id),
     UNIQUE (user_id, place_id)
