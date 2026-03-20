@@ -205,8 +205,6 @@ Tables created automatically on startup via `db.create_all()`:
 
 The relational schema is also documented in [ER_diagram.pdf](./docs/ER_diagram.pdf), which provides a visual overview of the database entities and their relationships.
 
-![ER Diagram](./docs/ER_diagram.png)
-
 ### Also ER Diagram mermaid version
 
 ![ER Diagram](./ER_diagram.png)
