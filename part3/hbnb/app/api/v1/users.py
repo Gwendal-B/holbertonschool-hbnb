@@ -1,6 +1,6 @@
 import re
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 api = Namespace('users', description='User operations')
@@ -62,7 +62,7 @@ def validate_admin_update_payload(data):
 # API models
 # ---------------------------------------------------------------------------
 
-# Création — is_admin optionnel (ignoré si le requêteur n'est pas admin)
+# Création — admin only, is_admin peut être True ou False
 user_model = api.model('User', {
     'first_name': fields.String(required=True,  description='First name'),
     'last_name':  fields.String(required=True,  description='Last name'),
@@ -112,31 +112,19 @@ def user_to_dict(user):
 @api.route('/')
 class UserList(Resource):
 
+    @jwt_required()
+    @api.doc(security='BearerAuth')
     @api.expect(user_model, validate=True)
     @api.response(201, 'User successfully created', user_response_model)
     @api.response(400, 'Invalid input data')
+    @api.response(403, 'Admin privileges required')
     def post(self):
-        """Register a new user.
+        """Create a new user — admin only."""
+        claims = get_jwt()
+        if not claims.get('is_admin', False):
+            return {'error': 'Admin privileges required'}, 403
 
-        - **Public / regular users**: `is_admin` is ignored — always set to False.
-        - **Admins** (valid JWT with `is_admin: true`): can pass `is_admin=True`
-          to create another administrator.
-        """
         user_data = dict(api.payload)
-
-        # Vérifie si le requêteur est un admin authentifié (token optionnel)
-        caller_is_admin = False
-        try:
-            verify_jwt_in_request(optional=True)
-            claims = get_jwt()
-            caller_is_admin = bool(claims.get('is_admin', False))
-        except Exception:
-            pass  # Pas de token ou token invalide → traité comme public
-
-        if not caller_is_admin:
-            # Un utilisateur normal ne peut pas se définir admin
-            user_data.pop('is_admin', None)
-            user_data['is_admin'] = False
 
         error = validate_create_payload(user_data)
         if error:
