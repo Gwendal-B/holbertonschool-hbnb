@@ -1,29 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Place Details</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Place Details</title>
+  <link rel="icon" href="images/icon.png" type="image/png" />
+  <link rel="stylesheet" href="styles/main.css" />
 </head>
 <body>
-    <main>
-        <section id="place-details">
-            <!-- Place details will be populated dynamically -->
-        </section>
-        <section id="reviews">
-            <!-- Reviews will be populated dynamically -->
-        </section>
-        <section id="add-review">
-            <h2>Add a Review</h2>
-            <form id="review-form">
-                <label for="review-text">Review:</label>
-                <textarea id="review-text" name="review-text" required></textarea>
-                
-                <button type="submit">Submit</button>
-            </form>
-        </section>
-    </main>
-    <script src="scripts.js"></script>
+
+  <!-- ── Header ── -->
+  <header>
+    <a href="index.html" aria-label="HBnB Home">
+      <span class="logo-text">HBnB</span>
+    </a>
+    <nav>
+      <a href="index.html">Places</a>
+      <a href="login.html" class="login-button" id="login-link">Login</a>
+    </nav>
+  </header>
+
+  <!-- ── Main ── -->
+  <main>
+
+    <!-- Loading -->
+    <div id="loading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading place details…</p>
+    </div>
+
+    <!-- Place Details -->
+    <div id="place-content" class="hidden">
+
+      <!-- Place Card -->
+      <div class="place-details" id="place-details-card">
+        <div class="place-details-header">
+          <h1 class="place-details-title" id="place-name">—</h1>
+          <span class="place-price-tag" id="place-price">—</span>
+        </div>
+
+        <img id="place-img" class="place-details-img" src="" alt="Place photo" />
+
+        <!-- Info grid -->
+        <div class="place-info">
+          <div class="place-info-item">
+            <div class="place-info-label">Host</div>
+            <div class="place-info-value" id="place-host">—</div>
+          </div>
+          <div class="place-info-item">
+            <div class="place-info-label">Location</div>
+            <div class="place-info-value" id="place-location">—</div>
+          </div>
+          <div class="place-info-item">
+            <div class="place-info-label">Guests</div>
+            <div class="place-info-value" id="place-guests">—</div>
+          </div>
+          <div class="place-info-item">
+            <div class="place-info-label">Bathrooms</div>
+            <div class="place-info-value" id="place-bathrooms">—</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <p class="place-description" id="place-description">—</p>
+
+        <!-- Amenities -->
+        <h2 class="section-title">Amenities</h2>
+        <ul class="amenities-list" id="amenities-list"></ul>
+      </div>
+
+      <!-- Add Review button (only if logged in) -->
+      <div id="add-review-section" class="hidden">
+        <a href="add_review.html" class="add-review-btn" id="add-review-link">
+          ＋ Write a review
+        </a>
+      </div>
+
+      <!-- Reviews -->
+      <h2 class="section-title">Reviews</h2>
+      <div class="reviews-grid" id="reviews-list">
+        <p class="text-muted">No reviews yet. Be the first!</p>
+      </div>
+
+    </div><!-- /place-content -->
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>&copy; 2024 HBnB. All rights reserved.</p>
+  </footer>
+
+  <script src="scripts/api.js"></script>
+  <script src="scripts/place.js"></script>
 </body>
 </html>
