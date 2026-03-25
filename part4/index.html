@@ -4,25 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>List of Places</title>
+    <link rel="icon" href="images/icon.png" type="image/png" />
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- ── Header ── -->
     <header>
+      <a href="index.html" aria-label="HBnB Home">
+        <span class="logo-text">HBnB</span>
+      </a>
         <nav>
-            <a href="login.html" id="login-link">Login</a>
+          <a href="index.html">Places</a>
+          <a href="login.html" class="login-button" id="login-link">Login</a>
         </nav>
     </header>
+
+    <!-- ── Main ── -->
     <main>
-        <section id="filter">
-            <label for="price-filter">Max Price:</label>
-            <select id="price-filter">
-                <!-- Options will be populated dynamically -->
-            </select>
-        </section>
-        <section id="places-list">
-            <!-- List of places will be populated dynamically -->
-        </section>
+      <h1 class="page-title">Places to stay</h1>
+      <p class="page-subtitle">Discover unique homes around the world</p>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <label for="country-filter">Filter by country:</label>
+        <select id="country-filter">
+          <option value="all">All countries</option>
+        </select>
+      </div>
+
+      <!-- Places Grid -->
+      <div id="places-list">
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading places…</p>
+        </div>
+      </div>
     </main>
-    <script src="scripts.js"></script>
+
+    <!-- ── Footer ── -->
+    <footer>
+      <p>&copy; 2026 HBnB. All rights reserved.</p>
+    </footer>
+
+    <script src="scripts/api.js"></script>
+    <script src="scripts/index.js"></script>
 </body>
 </html>
