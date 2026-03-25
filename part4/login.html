@@ -1,24 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="icon" href="images/icon.png" type="image/png" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <main>
-        <form id="login-form">
-            <h2>Login</h2>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            
-            <button type="submit">Login</button>
+
+  <!-- ── Header ── -->
+  <header>
+    <a href="index.html" aria-label="HBnB Home">
+      <span class="logo-text">HBnB</span>
+    </a>
+    <nav>
+      <a href="index.html">Places</a>
+      <a href="login.html" class="login-button">Login</a>
+    </nav>
+  </header>
+
+  <!-- ── Main ── -->
+  <main>
+    <div class="form-container">
+      <div class="form-card">
+        <h1>Welcome back</h1>
+        <p class="form-sub">Sign in to manage your bookings and reviews.</p>
+
+        <form id="login-form" novalidate>
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+            <span class="form-error" id="email-error">Please enter a valid email.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <span class="form-error" id="password-error">Password is required.</span>
+          </div>
+
+          <button type="submit" class="btn-primary" id="submit-btn">Sign in</button>
+
+          <div class="form-message" id="form-message"></div>
         </form>
-    </main>
-    <script src="scripts.js"></script>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <p>&copy; 2024 HBnB. All rights reserved.</p>
+  </footer>
+
+  <script src="scripts/api.js"></script>
+  <script src="scripts/login.js"></script>
 </body>
 </html>
