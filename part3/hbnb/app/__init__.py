@@ -14,6 +14,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     CORS(app)
     app.config.from_object(config_class)
+    app.url_map.strict_slashes = False
 
     # Initialise Flask-Bcrypt avec l'app et initialise JWT manager mais aussi la database
     bcrypt.init_app(app)
