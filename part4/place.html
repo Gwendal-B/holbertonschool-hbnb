@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Place Details</title>
+  <title>HBnB — Place Details</title>
   <link rel="icon" href="images/icon.png" type="image/png" />
   <link rel="stylesheet" href="styles/main.css" />
 </head>
@@ -23,66 +23,14 @@
   <!-- ── Main ── -->
   <main>
 
-    <!-- Loading -->
-    <div id="loading" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Loading place details…</p>
+    <!-- Peuplé dynamiquement par displayPlaceDetails() -->
+    <div id="place-details"></div>
+
+    <!-- Section Add Review — visible seulement si connecté -->
+    <div id="add-review" style="display: none;">
+      <h2 class="section-title">Add a Review</h2>
+      <a id="add-review-link" href="#" class="add-review-btn">Write a review</a>
     </div>
-
-    <!-- Place Details -->
-    <div id="place-content" class="hidden">
-
-      <!-- Place Card -->
-      <div class="place-details" id="place-details-card">
-        <div class="place-details-header">
-          <h1 class="place-details-title" id="place-name">—</h1>
-          <span class="place-price-tag" id="place-price">—</span>
-        </div>
-
-        <img id="place-img" class="place-details-img" src="" alt="Place photo" />
-
-        <!-- Info grid -->
-        <div class="place-info">
-          <div class="place-info-item">
-            <div class="place-info-label">Host</div>
-            <div class="place-info-value" id="place-host">—</div>
-          </div>
-          <div class="place-info-item">
-            <div class="place-info-label">Location</div>
-            <div class="place-info-value" id="place-location">—</div>
-          </div>
-          <div class="place-info-item">
-            <div class="place-info-label">Guests</div>
-            <div class="place-info-value" id="place-guests">—</div>
-          </div>
-          <div class="place-info-item">
-            <div class="place-info-label">Bathrooms</div>
-            <div class="place-info-value" id="place-bathrooms">—</div>
-          </div>
-        </div>
-
-        <!-- Description -->
-        <p class="place-description" id="place-description">—</p>
-
-        <!-- Amenities -->
-        <h2 class="section-title">Amenities</h2>
-        <ul class="amenities-list" id="amenities-list"></ul>
-      </div>
-
-      <!-- Add Review button (only if logged in) -->
-      <div id="add-review-section" class="hidden">
-        <a href="add_review.html" class="add-review-btn" id="add-review-link">
-          ＋ Write a review
-        </a>
-      </div>
-
-      <!-- Reviews -->
-      <h2 class="section-title">Reviews</h2>
-      <div class="reviews-grid" id="reviews-list">
-        <p class="text-muted">No reviews yet. Be the first!</p>
-      </div>
-
-    </div><!-- /place-content -->
 
   </main>
 
