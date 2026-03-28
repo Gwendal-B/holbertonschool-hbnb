@@ -25,21 +25,19 @@
     <h1 class="page-title">Places to stay</h1>
     <p class="page-subtitle">Discover unique homes around the world</p>
 
-    <!-- Filter Bar -->
+    <!-- Filter Bar — options fixes selon spec T2 -->
     <div class="filter-bar">
-      <label for="country-filter">Filter by country:</label>
-      <select id="country-filter">
-        <option value="all">All countries</option>
+      <label for="price-filter">Max price per night:</label>
+      <select id="price-filter">
+        <option value="All">All</option>
+        <option value="10">$10</option>
+        <option value="50">$50</option>
+        <option value="100">$100</option>
       </select>
     </div>
 
-    <!-- Places Grid -->
-    <div id="places-list">
-      <div class="loading-state">
-        <div class="loading-spinner"></div>
-        <p>Loading places…</p>
-      </div>
-    </div>
+    <!-- Places Grid — peuplé dynamiquement par index.js -->
+    <div id="places-list"></div>
   </main>
 
   <!-- ── Footer ── -->

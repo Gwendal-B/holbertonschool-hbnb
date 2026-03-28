@@ -1,114 +1,135 @@
 /**
- * index.js — Page principale : liste des places + filtre par pays
+ * index.js — Task 2 : List of Places
  *
- * Flux :
- *  1. Vérifie l'authentification → adapte le bouton header
- *  2. GET /places (public, pas de token requis selon spec)
- *  3. Construit la liste de pays pour le filtre
- *  4. Affiche les cards, filtre côté client sur changement du select
+ * Fonctions exactes demandées par le cahier des charges :
+ *   - getCookie(name)
+ *   - checkAuthentication()
+ *   - fetchPlaces(token)
+ *   - displayPlaces(places)
+ *   - filtre #price-filter (event listener)
  */
 
 'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const { api, isAuthenticated } = window.HBnB;
+/* ─────────────────────────────────────────────
+   Récupère la valeur d'un cookie par son nom
+   ───────────────────────────────────────────── */
+function getCookie(name) {
+  const cookies = document.cookie.split('; ');
+  const found   = cookies.find(row => row.startsWith(name + '='));
+  return found ? decodeURIComponent(found.split('=')[1]) : null;
+}
 
-  /* ── Header : bouton login / logout ── */
+/* ─────────────────────────────────────────────
+   Vérifie l'authentification
+   - Pas de token  → affiche le lien login
+   - Token présent → cache le lien login + fetch les places
+   ───────────────────────────────────────────── */
+function checkAuthentication() {
+  const token     = getCookie('token');
   const loginLink = document.getElementById('login-link');
-  if (isAuthenticated()) {
-    loginLink.textContent = 'Logout';
-    loginLink.href        = '#';
-    loginLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.HBnB.removeToken();
-      window.location.reload();
+
+  if (!token) {
+    loginLink.style.display = 'block';
+  } else {
+    loginLink.style.display = 'none';
+    fetchPlaces(token);
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Fetch GET /places avec le token en header
+   ───────────────────────────────────────────── */
+async function fetchPlaces(token) {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/v1/places', {
+      method: 'GET',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const places = await response.json();
+    displayPlaces(places);
+
+  } catch (err) {
+    const listEl = document.getElementById('places-list');
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <p>⚠ Could not load places: ${err.message}</p>
+        <p style="font-size:0.82rem;margin-top:0.5rem;">
+          Make sure the API is running on <code>http://127.0.0.1:5000</code>
+        </p>
+      </div>`;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Construit et affiche les cards dans #places-list
+   Stocke le prix en data-price pour le filtre
+   ───────────────────────────────────────────── */
+function displayPlaces(places) {
+  const listEl = document.getElementById('places-list');
+  listEl.innerHTML = '';   // vide le contenu actuel
+
+  if (!places || places.length === 0) {
+    listEl.innerHTML = '<p class="empty-state">No places available.</p>';
+    return;
   }
 
-  /* ── DOM refs ── */
-  const listEl    = document.getElementById('places-list');
-  const filterEl  = document.getElementById('country-filter');
+  places.forEach(place => {
+    const price = place.price_by_night ?? place.price ?? 0;
 
-  let allPlaces = [];  // cache complet
-
-  /* ── Construit une place card ── */
-  function buildCard(place) {
     const card = document.createElement('div');
-    card.className   = 'place-card';
-    card.dataset.country = (place.country || '').toLowerCase();
-
-    // Image placeholder générique si aucune image fournie par l'API
-    const imgSrc = place.image_url || 'images/placeholder.svg';
+    card.className        = 'place-card';
+    card.dataset.price    = price;   // utilisé par le filtre
 
     card.innerHTML = `
-      <img class="place-card-img" src="${imgSrc}" alt="${escHtml(place.title || place.name)}" loading="lazy" />
       <div class="place-card-name">${escHtml(place.title || place.name)}</div>
-      <div class="place-card-price">$${place.price_by_night ?? place.price ?? '—'} / night</div>
+      <div class="place-card-price">$${price} / night</div>
       <div class="place-card-location">${escHtml(place.city || '')}${place.country ? ', ' + escHtml(place.country) : ''}</div>
       <a class="details-button" href="place.html?id=${encodeURIComponent(place.id)}">View Details</a>
     `;
-    return card;
-  }
 
-  /* ── Peuple le select des pays ── */
-  function populateFilter(places) {
-    const countries = [...new Set(
-      places.map(p => p.country).filter(Boolean)
-    )].sort();
+    listEl.appendChild(card);
+  });
+}
 
-    countries.forEach(country => {
-      const opt = document.createElement('option');
-      opt.value = country.toLowerCase();
-      opt.textContent = country;
-      filterEl.appendChild(opt);
-    });
-  }
+/* ─────────────────────────────────────────────
+   Filtre par prix côté client (sans rechargement)
+   options : 10 | 50 | 100 | All
+   ───────────────────────────────────────────── */
+document.getElementById('price-filter').addEventListener('change', (event) => {
+  const selected = event.target.value;
+  const cards    = document.querySelectorAll('.place-card');
 
-  /* ── Affiche / filtre les cards ── */
-  function renderPlaces(places) {
-    listEl.innerHTML = '';
+  cards.forEach(card => {
+    const cardPrice = parseFloat(card.dataset.price);
 
-    if (places.length === 0) {
-      listEl.innerHTML = '<p class="empty-state">No places found for this filter.</p>';
-      return;
-    }
-
-    places.forEach(place => listEl.appendChild(buildCard(place)));
-  }
-
-  /* ── Filtre sur changement du select ── */
-  filterEl.addEventListener('change', () => {
-    const val = filterEl.value;
-    if (val === 'all') {
-      renderPlaces(allPlaces);
+    if (selected === 'All') {
+      card.style.display = '';          // affiche tout
     } else {
-      renderPlaces(allPlaces.filter(p =>
-        (p.country || '').toLowerCase() === val
-      ));
+      const maxPrice = parseFloat(selected);
+      card.style.display = cardPrice <= maxPrice ? '' : 'none';
     }
   });
-
-  /* ── Fetch initial ── */
-  async function loadPlaces() {
-    try {
-      const places = await api.getPlaces();
-      allPlaces = places;
-
-      populateFilter(places);
-      renderPlaces(places);
-    } catch (err) {
-      listEl.innerHTML = `
-        <div class="empty-state">
-          <p>⚠ Could not load places: ${escHtml(err.message)}</p>
-          <p style="font-size:0.82rem; margin-top:0.5rem;">Make sure the API is running at <code>http://127.0.0.1:5000</code></p>
-        </div>`;
-    }
-  }
-
-  loadPlaces();
 });
 
-/* ── XSS helper ── */
+/* ─────────────────────────────────────────────
+   Point d'entrée
+   ───────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  checkAuthentication();
+});
+
+/* ─────────────────────────────────────────────
+   Helper anti-XSS
+   ───────────────────────────────────────────── */
 function escHtml(str) {
   return String(str ?? '')
     .replace(/&/g, '&amp;')
