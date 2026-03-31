@@ -52,7 +52,8 @@ async function submitReview(token, placeId, reviewText) {
     },
     body: JSON.stringify({
       text:   reviewText,
-      rating: parseInt(document.getElementById('rating').value, 10)
+      rating: parseInt(document.getElementById('rating').value, 10),
+      place_id: placeId
     })
   });
 

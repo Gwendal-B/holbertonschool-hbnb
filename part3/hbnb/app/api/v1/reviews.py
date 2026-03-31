@@ -7,7 +7,6 @@ api = Namespace('reviews', description='Review operations')
 review_model = api.model('Review', {
     'text':     fields.String(required=True,  description='Text of the review'),
     'rating':   fields.Integer(required=True, description='Rating of the place (1-5)'),
-    'user_id':  fields.String(required=True,  description='ID of the user'),
     'place_id': fields.String(required=True,  description='ID of the place')
 })
 
@@ -38,6 +37,8 @@ def validate_review_payload(data):
     rating = data['rating']
     if not isinstance(rating, int) or not (1 <= rating <= 5):
         return "Rating must be an integer between 1 and 5"
+    if not data.get('place_id') or not str(data['place_id']).strip():
+        return "'place_id' is required and cannot be empty"
     return None
 
 

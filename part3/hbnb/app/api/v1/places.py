@@ -51,7 +51,17 @@ def marshal_place(place):
             "last_name": place.owner.last_name,
             "email": place.owner.email
         },
-        "amenities": [{"id": a.id, "name": a.name} for a in place.amenities]
+        "amenities": [{"id": a.id, "name": a.name} for a in place.amenities],
+        "reviews": [           # ← ajouter ça
+            {
+                "id": r.id,
+                "text": r.text,
+                "rating": r.rating,
+                "user_id": r.user.id,
+                "user_name": f"{r.user.first_name} {r.user.last_name}"
+            }
+            for r in place.reviews
+        ]
     }
 
 
