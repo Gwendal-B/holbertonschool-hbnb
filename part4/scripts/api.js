@@ -56,7 +56,7 @@ function deleteCookie(name) {
    Token JWT
    ───────────────────────────────────────────────── */
 
-const TOKEN_KEY = 'hbnb_token';
+const TOKEN_KEY = 'token';
 
 /** Récupère le JWT stocké en cookie. */
 function getToken() {

@@ -27,7 +27,7 @@ async function loginUser(email, password) {
 
   if (response.ok) {
     const data = await response.json();
-    setCookie('hbnb_token', data.access_token);
+    setCookie('token', data.access_token);
     window.location.href = 'index.html';
   } else {
     /* Essaie de lire un message JSON, sinon affiche le statusText */

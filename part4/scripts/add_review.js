@@ -1,115 +1,101 @@
 /**
- * add_review.js — Formulaire d'ajout de review
+ * add_review.js — Task 4 : Add Review Form
  *
- * Flux :
- *  1. Si NON authentifié → redirect index.html
- *  2. Lit ?id= pour avoir le placeId
- *  3. Submit → POST /places/:id/reviews
- *  4. Succès → redirect place.html?id=...
+ * Fonctions exactes demandées par le cahier des charges :
+ *   - getCookie(name)
+ *   - checkAuthentication()     → retourne le token ou redirect
+ *   - getPlaceIdFromURL()
+ *   - submitReview(token, placeId, reviewText)
+ *   - handleResponse(response)
  */
 
 'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const { api, isAuthenticated } = window.HBnB;
+/* ─────────────────────────────────────────────
+   Récupère la valeur d'un cookie par son nom
+   ───────────────────────────────────────────── */
+function getCookie(name) {
+  const cookies = document.cookie.split('; ');
+  const found   = cookies.find(row => row.startsWith(name + '='));
+  return found ? decodeURIComponent(found.split('=')[1]) : null;
+}
 
-  /* ── Guard : authentification requise ── */
-  if (!isAuthenticated()) {
+/* ─────────────────────────────────────────────
+   Vérifie l'auth — redirige si pas de token
+   Retourne le token si présent
+   ───────────────────────────────────────────── */
+function checkAuthentication() {
+  const token = getCookie('token');
+  if (!token) {
     window.location.href = 'index.html';
-    return;
   }
+  return token;
+}
 
-  /* ── Lit l'ID de la place ── */
-  const params  = new URLSearchParams(window.location.search);
-  const placeId = params.get('id');
+/* ─────────────────────────────────────────────
+   Extrait le place ID depuis ?id=... dans l'URL
+   ───────────────────────────────────────────── */
+function getPlaceIdFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('id');
+}
+
+/* ─────────────────────────────────────────────
+   Envoie le review via POST /places/:id/reviews
+   ───────────────────────────────────────────── */
+async function submitReview(token, placeId, reviewText) {
+  const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}/reviews`, {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      text:   reviewText,
+      rating: parseInt(document.getElementById('rating').value, 10)
+    })
+  });
+
+  handleResponse(response);
+}
+
+/* ─────────────────────────────────────────────
+   Gère la réponse de l'API
+   ───────────────────────────────────────────── */
+function handleResponse(response) {
+  if (response.ok) {
+    alert('Review submitted successfully!');
+    document.getElementById('review-form').reset();   // vide le formulaire
+  } else {
+    alert('Failed to submit review');
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Point d'entrée
+   ───────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  const reviewForm = document.getElementById('review-form');
+  const token      = checkAuthentication();   // redirect si pas connecté
+  const placeId    = getPlaceIdFromURL();
 
   if (!placeId) {
     window.location.href = 'index.html';
     return;
   }
 
-  /* ── DOM refs ── */
-  const form       = document.getElementById('review-form');
-  const ratingEl   = document.getElementById('rating');
-  const textEl     = document.getElementById('review-text');
-  const submitBtn  = document.getElementById('submit-btn');
-  const msgEl      = document.getElementById('form-message');
+  if (reviewForm) {
+    reviewForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
 
-  /* ── Helpers ── */
-  function showMessage(text, type) {
-    msgEl.textContent   = text;
-    msgEl.className     = `form-message ${type}`;
-    msgEl.style.display = 'block';
-  }
+      const reviewText = document.getElementById('review-text').value.trim();
 
-  function showFieldError(id, text) {
-    const el = document.getElementById(id);
-    if (el) { el.textContent = text; el.style.display = 'block'; }
-  }
-
-  function clearErrors() {
-    document.querySelectorAll('.form-error').forEach(el => {
-      el.style.display = 'none';
-    });
-    msgEl.style.display = 'none';
-  }
-
-  function validate() {
-    let valid = true;
-    clearErrors();
-
-    if (!ratingEl.value) {
-      showFieldError('rating-error', 'Please select a rating.');
-      valid = false;
-    }
-
-    if (!textEl.value.trim()) {
-      showFieldError('text-error', 'Please write your review before submitting.');
-      valid = false;
-    } else if (textEl.value.trim().length < 10) {
-      showFieldError('text-error', 'Your review must be at least 10 characters.');
-      valid = false;
-    }
-
-    return valid;
-  }
-
-  /* ── Optionnel : affiche le nom de la place dans le sous-titre ── */
-  async function fetchPlaceName() {
-    try {
-      const place = await window.HBnB.api.getPlace(placeId);
-      const subEl = document.getElementById('place-name-sub');
-      if (subEl && (place.title || place.name)) {
-        subEl.textContent = `You're reviewing "${place.title || place.name}".`;
+      if (!reviewText) {
+        alert('Please write your review before submitting.');
+        return;
       }
-    } catch (_) { /* pas bloquant */ }
+
+      await submitReview(token, placeId, reviewText);
+    });
   }
-
-  fetchPlaceName();
-
-  /* ── Submit ── */
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    if (!validate()) return;
-
-    submitBtn.disabled    = true;
-    submitBtn.textContent = 'Submitting…';
-
-    try {
-      await api.addReview(placeId, {
-        text:   textEl.value.trim(),
-        rating: parseInt(ratingEl.value, 10),
-      });
-
-      showMessage('Review submitted! Redirecting…', 'success');
-      setTimeout(() => {
-        window.location.href = `place.html?id=${encodeURIComponent(placeId)}`;
-      }, 1200);
-    } catch (err) {
-      showMessage(`Failed to submit review: ${err.message}`, 'error');
-      submitBtn.disabled    = false;
-      submitBtn.textContent = 'Submit review';
-    }
-  });
 });

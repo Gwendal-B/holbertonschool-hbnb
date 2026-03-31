@@ -25,9 +25,10 @@
     <div class="form-container">
       <div class="form-card">
         <h1>Write a review</h1>
-        <p class="form-sub" id="place-name-sub">Share your experience with this place.</p>
+        <p class="form-sub">Share your experience with this place.</p>
 
         <form id="review-form" novalidate>
+
           <div class="form-group">
             <label for="rating">Rating</label>
             <select id="rating" name="rating" required>
@@ -38,7 +39,6 @@
               <option value="4">⭐⭐⭐⭐ 4 — Very Good</option>
               <option value="5">⭐⭐⭐⭐⭐ 5 — Excellent</option>
             </select>
-            <span class="form-error" id="rating-error">Please select a rating.</span>
           </div>
 
           <div class="form-group">
@@ -49,12 +49,10 @@
               placeholder="Tell others what you liked (or didn't) about this place…"
               required
             ></textarea>
-            <span class="form-error" id="text-error">Please write your review.</span>
           </div>
 
-          <button type="submit" class="btn-primary" id="submit-btn">Submit review</button>
+          <button type="submit" class="btn-primary">Submit review</button>
 
-          <div class="form-message" id="form-message"></div>
         </form>
 
         <p class="mt-2 text-muted" style="font-size:0.82rem;">
@@ -69,8 +67,7 @@
     <p>&copy; 2024 HBnB. All rights reserved.</p>
   </footer>
 
-  <script src="scripts/api.js"></script>
+  <!-- add_review.js est autonome : pas besoin de api.js -->
   <script src="scripts/add_review.js"></script>
 </body>
 </html>
-
