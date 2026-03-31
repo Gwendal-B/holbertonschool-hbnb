@@ -84,6 +84,8 @@ class ReviewList(Resource):
         if data.get('user_id') != current_user_id and not claims.get('is_admin', False):
             return {'error': 'Unauthorized action — user_id must match your user ID'}, 403
 
+        data['user_id'] = current_user_id
+
         place_id = data.get('place_id')
 
         # Interdit de reviewer sa propre place
