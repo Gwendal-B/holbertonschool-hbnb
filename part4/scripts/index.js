@@ -31,8 +31,17 @@ function checkAuthentication() {
 
   if (!token) {
     loginLink.style.display = 'block';
+    loginLink.textContent   = 'Login';
+    loginLink.href          = 'login.html';
   } else {
-    loginLink.style.display = 'none';
+    loginLink.style.display = 'block';
+    loginLink.textContent   = 'Logout';
+    loginLink.href          = '#';
+    loginLink.onclick       = (e) => {
+      e.preventDefault();
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      window.location.reload();
+    };
   }
   fetchPlaces(token);
 }

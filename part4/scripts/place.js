@@ -34,14 +34,26 @@ function getCookie(name) {
    - Token présent → affiche #add-review + fetch
    ───────────────────────────────────────────── */
 function checkAuthentication() {
-  const token          = getCookie('token');
+  const token            = getCookie('token');
+  const loginLink        = document.getElementById('login-link');
   const addReviewSection = document.getElementById('add-review');
 
   if (!token) {
+    loginLink.style.display   = 'block';
+    loginLink.textContent     = 'Login';
+    loginLink.href            = 'login.html';
     addReviewSection.style.display = 'none';
   } else {
+    loginLink.style.display   = 'block';
+    loginLink.textContent     = 'Logout';
+    loginLink.href            = '#';
+    loginLink.onclick         = (e) => {
+      e.preventDefault();
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      window.location.href = 'index.html';
+    };
     addReviewSection.style.display = 'block';
-    fetchPlaceDetails(token, placeId);   // placeId = variable globale définie en bas
+    fetchPlaceDetails(token, placeId);
   }
 }
 
