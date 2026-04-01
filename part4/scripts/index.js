@@ -4,16 +4,24 @@
 
 'use strict';
 
-/* Photos Unsplash libres de droits pour les cards */
+/* Photos Unsplash — villes & destinations pour les cards */
 const PLACE_PHOTOS = [
-  'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=75',
-  'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=600&q=75',
-  'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=600&q=75',
-  'https://images.unsplash.com/photo-1505873242700-f289a29e1e0f?w=600&q=75',
-  'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=75',
-  'https://images.unsplash.com/photo-1587381420270-3e1a5b9e6904?w=600&q=75',
-  'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=600&q=75',
-  'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&q=75',
+  /* Paris */
+  'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=75',
+  /* New York */
+  'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=600&q=75',
+  /* Tokyo */
+  'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=75',
+  /* Barcelone */
+  'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=75',
+  /* Santorini */
+  'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&q=75',
+  /* Londres */
+  'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&q=75',
+  /* Bali */
+  'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=75',
+  /* Marrakech */
+  'https://images.unsplash.com/photo-1553603227-2358aabe821e?w=600&q=75',
 ];
 
 function getCookie(name) {
