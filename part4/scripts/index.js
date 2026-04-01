@@ -33,8 +33,8 @@ function checkAuthentication() {
     loginLink.style.display = 'block';
   } else {
     loginLink.style.display = 'none';
-    fetchPlaces(token);
   }
+  fetchPlaces(token);
 }
 
 /* ─────────────────────────────────────────────
@@ -42,12 +42,12 @@ function checkAuthentication() {
    ───────────────────────────────────────────── */
 async function fetchPlaces(token) {
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     const response = await fetch('http://127.0.0.1:5000/api/v1/places', {
       method: 'GET',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+      headers: headers
     });
 
     if (!response.ok) {

@@ -80,10 +80,6 @@ class ReviewList(Resource):
         if error:
             return {"error": error}, 400
 
-        # user_id doit correspondre à l'utilisateur connecté (sauf admin)
-        if data.get('user_id') != current_user_id and not claims.get('is_admin', False):
-            return {'error': 'Unauthorized action — user_id must match your user ID'}, 403
-
         data['user_id'] = current_user_id
 
         place_id = data.get('place_id')
