@@ -20,6 +20,7 @@
       </svg>
       <span class="logo-text">HB<span>nB</span></span>
     </a>
+
     <nav>
       <a href="index.html">Explore</a>
       <a href="login.html" class="login-button" id="login-link">Sign in</a>
@@ -33,6 +34,7 @@
         <p>Loading place details…</p>
       </div>
     </div>
+
     <div id="add-review" style="display: none;">
       <h2 class="section-title">Add a Review</h2>
       <a id="add-review-link" href="#" class="add-review-btn">Write a review</a>
@@ -42,6 +44,11 @@
   <footer>
     <p>&copy; 2024 HBnB. All rights reserved.</p>
   </footer>
+
+  <div id="lightbox" class="lightbox hidden">
+    <span id="lightbox-close" class="lightbox-close">&times;</span>
+    <img id="lightbox-image" class="lightbox-image" src="" alt="Expanded photo" />
+  </div>
 
   <script src="scripts/api.js"></script>
   <script src="scripts/places-images.js"></script>

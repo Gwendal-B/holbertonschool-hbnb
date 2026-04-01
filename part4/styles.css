@@ -367,14 +367,19 @@ main {
 }
 
 .place-card-location {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
-.place-card-location::before {
-  content: '📍';
-  font-size: 0.7rem;
+
+.location-pin {
+  color: #d94b70;
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 .place-card-price {
