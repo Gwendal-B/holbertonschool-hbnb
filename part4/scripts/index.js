@@ -1,148 +1,124 @@
 /**
- * index.js — Task 2 : List of Places
- *
- * Fonctions exactes demandées par le cahier des charges :
- *   - getCookie(name)
- *   - checkAuthentication()
- *   - fetchPlaces(token)
- *   - displayPlaces(places)
- *   - filtre #price-filter (event listener)
+ * index.js — Task 2 : List of Places (redesign nature/voyage)
  */
 
 'use strict';
 
-/* ─────────────────────────────────────────────
-   Récupère la valeur d'un cookie par son nom
-   ───────────────────────────────────────────── */
+/* Photos Unsplash libres de droits pour les cards */
+const PLACE_PHOTOS = [
+  'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=75',
+  'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=600&q=75',
+  'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=600&q=75',
+  'https://images.unsplash.com/photo-1505873242700-f289a29e1e0f?w=600&q=75',
+  'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=75',
+  'https://images.unsplash.com/photo-1587381420270-3e1a5b9e6904?w=600&q=75',
+  'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=600&q=75',
+  'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600&q=75',
+];
+
 function getCookie(name) {
   const cookies = document.cookie.split('; ');
   const found   = cookies.find(row => row.startsWith(name + '='));
   return found ? decodeURIComponent(found.split('=')[1]) : null;
 }
 
-/* ─────────────────────────────────────────────
-   Vérifie l'authentification
-   - Pas de token  → affiche le lien login
-   - Token présent → cache le lien login + fetch les places
-   ───────────────────────────────────────────── */
 function checkAuthentication() {
   const token     = getCookie('token');
   const loginLink = document.getElementById('login-link');
 
   if (!token) {
     loginLink.style.display = 'block';
-    loginLink.textContent   = 'Login';
-    loginLink.href          = 'login.html';
   } else {
-    loginLink.style.display = 'block';
-    loginLink.textContent   = 'Logout';
-    loginLink.href          = '#';
-    loginLink.onclick = (e) => {
-      e.preventDefault();
-      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      window.location.reload();
-    };
+    loginLink.style.display = 'none';
+    fetchPlaces(token);
   }
-  fetchPlaces(token);
 }
 
-/* ─────────────────────────────────────────────
-   Fetch GET /places avec le token en header
-   ───────────────────────────────────────────── */
 async function fetchPlaces(token) {
   try {
-    const headers = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
     const response = await fetch('http://127.0.0.1:5000/api/v1/places', {
       method: 'GET',
-      headers: headers
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${token}`
+      }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const places = await response.json();
     displayPlaces(places);
 
   } catch (err) {
-    const listEl = document.getElementById('places-list');
-    listEl.innerHTML = `
+    document.getElementById('places-list').innerHTML = `
       <div class="empty-state">
-        <p>⚠ Could not load places: ${err.message}</p>
-        <p style="font-size:0.82rem;margin-top:0.5rem;">
-          Make sure the API is running on <code>http://127.0.0.1:5000</code>
-        </p>
+        <p>⚠ Could not load places: ${escHtml(err.message)}</p>
       </div>`;
   }
 }
 
-/* ─────────────────────────────────────────────
-   Construit et affiche les cards dans #places-list
-   Stocke le prix en data-price pour le filtre
-   ───────────────────────────────────────────── */
 function displayPlaces(places) {
   const listEl = document.getElementById('places-list');
-  listEl.innerHTML = '';   // vide le contenu actuel
+  listEl.innerHTML = '';
 
   if (!places || places.length === 0) {
-    listEl.innerHTML = '<p class="empty-state">No places available.</p>';
+    listEl.innerHTML = '<p class="empty-state">No places available yet.</p>';
     return;
   }
 
-  places.forEach(place => {
-    const price = place.price_by_night ?? place.price ?? 0;
+  places.forEach((place, index) => {
+    const price   = place.price_by_night ?? place.price ?? 0;
+    const photo   = PLACE_PHOTOS[index % PLACE_PHOTOS.length];
+    const country = place.country || place.city || 'Worldwide';
 
     const card = document.createElement('div');
-    card.className        = 'place-card';
-    card.dataset.price    = price;   // utilisé par le filtre
+    card.className     = 'place-card';
+    card.dataset.price = price;
 
     card.innerHTML = `
+      <div class="place-card-img-wrap">
+        <img class="place-card-img"
+             src="${photo}"
+             alt="${escHtml(place.title || place.name)}"
+             loading="lazy" />
+        <span class="place-card-badge">${escHtml(country)}</span>
+      </div>
       <div class="place-card-name">${escHtml(place.title || place.name)}</div>
-      <div class="place-card-price">$${price} / night</div>
-      <div class="place-card-location">${escHtml(place.city || '')}${place.country ? ', ' + escHtml(place.country) : ''}</div>
-      <a class="details-button" href="place.html?id=${encodeURIComponent(place.id)}">View Details</a>
+      <div class="place-card-location">${escHtml(place.city || country)}</div>
+      <div class="place-card-price">
+        $${price} <span>/ night</span>
+      </div>
+      <a class="details-button"
+         href="place.html?id=${encodeURIComponent(place.id)}">
+        View Details
+      </a>
     `;
 
     listEl.appendChild(card);
   });
 }
 
-/* ─────────────────────────────────────────────
-   Filtre par prix côté client (sans rechargement)
-   options : 10 | 50 | 100 | All
-   ───────────────────────────────────────────── */
+/* Filtre prix côté client */
 document.getElementById('price-filter').addEventListener('change', (event) => {
   const selected = event.target.value;
   const cards    = document.querySelectorAll('.place-card');
 
   cards.forEach(card => {
     const cardPrice = parseFloat(card.dataset.price);
-
     if (selected === 'All') {
-      card.style.display = '';          // affiche tout
+      card.style.display = '';
     } else {
-      const maxPrice = parseFloat(selected);
-      card.style.display = cardPrice <= maxPrice ? '' : 'none';
+      card.style.display = cardPrice <= parseFloat(selected) ? '' : 'none';
     }
   });
 });
 
-/* ─────────────────────────────────────────────
-   Point d'entrée
-   ───────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   checkAuthentication();
 });
 
-/* ─────────────────────────────────────────────
-   Helper anti-XSS
-   ───────────────────────────────────────────── */
 function escHtml(str) {
   return String(str ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

@@ -3,56 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HBnB — Add a Review</title>
+  <title>HBnB — Write a Review</title>
   <link rel="icon" href="images/icon.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .review-page-bg {
+      min-height: 100vh;
+      background-image: url('https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=1400&q=80');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 1rem 2rem;
+    }
+    .review-page-bg::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 74, 62, 0.5);
+      z-index: 0;
+    }
+    .form-container { position: relative; z-index: 1; width: 100%; }
+    .form-card { background: rgba(253,250,246,0.97); }
+  </style>
 </head>
 <body>
 
-  <!-- ── Header ── -->
-  <header>
-    <a href="index.html" aria-label="HBnB Home">
-      <span class="logo-text">HBnB</span>
+  <header id="site-header">
+    <a href="index.html" class="logo-wrap" aria-label="HBnB Home">
+      <svg class="logo" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="22" cy="22" r="21" fill="#2d4a3e"/>
+        <path d="M10 30 L10 18 L22 10 L34 18 L34 30 Z" fill="none" stroke="#f7f3ed" stroke-width="1.8"/>
+        <path d="M17 30 L17 23 Q17 21 19 21 L25 21 Q27 21 27 23 L27 30" fill="#f7f3ed"/>
+        <path d="M22 10 L22 7" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="22" cy="6" r="2" fill="#c9a84c"/>
+      </svg>
+      <span class="logo-text">HB<span>n</span>B</span>
     </a>
     <nav>
-      <a href="index.html">Places</a>
-      <a href="login.html" class="login-button" id="login-link">Login</a>
+      <a href="javascript:history.back()">← Back</a>
     </nav>
   </header>
 
-  <!-- ── Main ── -->
-  <main>
+  <div class="review-page-bg">
     <div class="form-container">
       <div class="form-card">
         <h1>Write a review</h1>
-        <p class="form-sub">Share your experience with this place.</p>
+        <p class="form-sub" id="place-name-sub">Share your experience with this place.</p>
 
         <form id="review-form" novalidate>
-
           <div class="form-group">
-            <label for="rating">Rating</label>
+            <label for="rating">Your rating</label>
             <select id="rating" name="rating" required>
               <option value="">Select a rating</option>
-              <option value="1">⭐ 1 — Poor</option>
-              <option value="2">⭐⭐ 2 — Fair</option>
-              <option value="3">⭐⭐⭐ 3 — Good</option>
-              <option value="4">⭐⭐⭐⭐ 4 — Very Good</option>
-              <option value="5">⭐⭐⭐⭐⭐ 5 — Excellent</option>
+              <option value="1">★ 1 — Poor</option>
+              <option value="2">★★ 2 — Fair</option>
+              <option value="3">★★★ 3 — Good</option>
+              <option value="4">★★★★ 4 — Very Good</option>
+              <option value="5">★★★★★ 5 — Excellent</option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="review-text">Your review</label>
-            <textarea
-              id="review-text"
-              name="text"
-              placeholder="Tell others what you liked (or didn't) about this place…"
-              required
-            ></textarea>
+            <textarea id="review-text" name="text"
+              placeholder="Tell others what made this place special…"
+              required></textarea>
           </div>
 
           <button type="submit" class="btn-primary">Submit review</button>
-
+          <div class="form-message" id="form-message"></div>
         </form>
 
         <p class="mt-2 text-muted" style="font-size:0.82rem;">
@@ -60,14 +81,12 @@
         </p>
       </div>
     </div>
-  </main>
+  </div>
 
-  <!-- ── Footer ── -->
   <footer>
     <p>&copy; 2024 HBnB. All rights reserved.</p>
   </footer>
 
-  <!-- add_review.js est autonome : pas besoin de api.js -->
   <script src="scripts/add_review.js"></script>
 </body>
 </html>

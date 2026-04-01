@@ -3,66 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login</title>
+  <title>HBnB — Sign in</title>
   <link rel="icon" href="images/icon.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- ── Header ── -->
   <header>
-    <a href="index.html" aria-label="HBnB Home">
-      <span class="logo-text">HBnB</span>
+    <a href="index.html" class="logo-wrap" aria-label="HBnB Home">
+      <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="20" fill="#2d4230"/>
+        <path d="M8 22 L20 10 L32 22" stroke="#c8d5c0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <rect x="12" y="22" width="16" height="11" rx="1.5" fill="none" stroke="#c8d5c0" stroke-width="2"/>
+        <rect x="17" y="27" width="6" height="6" rx="1" fill="#c4714a"/>
+        <path d="M20 10 C20 10 24 6 27 8 C25 11 21 12 20 10Z" fill="#7a9970"/>
+      </svg>
+      <span class="logo-text">HB<span>nB</span></span>
     </a>
     <nav>
-      <a href="index.html">Places</a>
-      <a href="login.html" class="login-button">Login</a>
+      <a href="index.html">Explore</a>
+      <a href="login.html" class="login-button" id="login-link">Sign in</a>
     </nav>
   </header>
 
-  <!-- ── Main ── -->
   <main>
     <div class="form-container">
       <div class="form-card">
         <h1>Welcome back</h1>
-        <p class="form-sub">Sign in to manage your bookings and reviews.</p>
+        <p class="form-sub">Sign in to discover and review unique places.</p>
 
         <form id="login-form" novalidate>
           <div class="form-group">
             <label for="email">Email address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
+            <input type="email" id="email" name="email"
+              placeholder="you@example.com" autocomplete="email" required />
             <span class="form-error" id="email-error">Please enter a valid email.</span>
           </div>
-
           <div class="form-group">
             <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="••••••••"
-              autocomplete="current-password"
-              required
-            />
+            <input type="password" id="password" name="password"
+              placeholder="••••••••" autocomplete="current-password" required />
             <span class="form-error" id="password-error">Password is required.</span>
           </div>
-
           <button type="submit" class="btn-primary" id="submit-btn">Sign in</button>
-
           <div class="form-message" id="form-message"></div>
         </form>
       </div>
     </div>
   </main>
 
-  <!-- ── Footer ── -->
   <footer>
     <p>&copy; 2024 HBnB. All rights reserved.</p>
   </footer>

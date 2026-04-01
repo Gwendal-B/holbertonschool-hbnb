@@ -3,44 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>List of Places</title>
+  <title>HBnB — Find your place</title>
   <link rel="icon" href="images/icon.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- ── Header ── -->
   <header>
-    <a href="index.html" aria-label="HBnB Home">
-      <span class="logo-text">HBnB</span>
+    <a href="index.html" class="logo-wrap" aria-label="HBnB Home">
+      <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="20" fill="#2d4230"/>
+        <path d="M8 22 L20 10 L32 22" stroke="#c8d5c0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <rect x="12" y="22" width="16" height="11" rx="1.5" fill="none" stroke="#c8d5c0" stroke-width="2"/>
+        <rect x="17" y="27" width="6" height="6" rx="1" fill="#c4714a"/>
+        <path d="M20 10 C20 10 24 6 27 8 C25 11 21 12 20 10Z" fill="#7a9970"/>
+      </svg>
+      <span class="logo-text">HB<span>nB</span></span>
     </a>
     <nav>
-      <a href="index.html">Places</a>
-      <a href="login.html" class="login-button" id="login-link">Login</a>
+      <a href="index.html">Explore</a>
+      <a href="login.html" class="login-button" id="login-link">Sign in</a>
     </nav>
   </header>
 
-  <!-- ── Main ── -->
   <main>
-    <h1 class="page-title">Places to stay</h1>
-    <p class="page-subtitle">Discover unique homes around the world</p>
 
-    <!-- Filter Bar — options fixes selon spec T2 -->
-    <div class="filter-bar">
-      <label for="price-filter">Max price per night:</label>
-      <select id="price-filter">
-        <option value="All">All</option>
-        <option value="10">$10</option>
-        <option value="50">$50</option>
-        <option value="100">$100</option>
-      </select>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Discover the world</p>
+        <h1 class="hero-title">Find your next<br><em>perfect escape</em></h1>
+        <p class="hero-sub">Unique places to stay, curated for travellers.</p>
+      </div>
+    </section>
+
+    <!-- Filter + Title -->
+    <div class="section-header">
+      <div>
+        <h2 class="page-title">Available places</h2>
+        <p class="page-subtitle">Showing all destinations</p>
+      </div>
+      <div class="filter-bar">
+        <label for="price-filter">Max price / night</label>
+        <select id="price-filter">
+          <option value="All">All</option>
+          <option value="10">$10</option>
+          <option value="50">$50</option>
+          <option value="100">$100</option>
+        </select>
+      </div>
     </div>
 
-    <!-- Places Grid — peuplé dynamiquement par index.js -->
-    <div id="places-list"></div>
+    <div id="places-list">
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading places…</p>
+      </div>
+    </div>
+
   </main>
 
-  <!-- ── Footer ── -->
   <footer>
     <p>&copy; 2024 HBnB. All rights reserved.</p>
   </footer>

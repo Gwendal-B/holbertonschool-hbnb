@@ -9,32 +9,36 @@
 </head>
 <body>
 
-  <!-- ── Header ── -->
   <header>
-    <a href="index.html" aria-label="HBnB Home">
-      <span class="logo-text">HBnB</span>
+    <a href="index.html" class="logo-wrap" aria-label="HBnB Home">
+      <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="20" fill="#2d4230"/>
+        <path d="M8 22 L20 10 L32 22" stroke="#c8d5c0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <rect x="12" y="22" width="16" height="11" rx="1.5" fill="none" stroke="#c8d5c0" stroke-width="2"/>
+        <rect x="17" y="27" width="6" height="6" rx="1" fill="#c4714a"/>
+        <path d="M20 10 C20 10 24 6 27 8 C25 11 21 12 20 10Z" fill="#7a9970"/>
+      </svg>
+      <span class="logo-text">HB<span>nB</span></span>
     </a>
     <nav>
-      <a href="index.html">Places</a>
-      <a href="login.html" class="login-button" id="login-link" style="display:none">Login</a>
+      <a href="index.html">Explore</a>
+      <a href="login.html" class="login-button" id="login-link">Sign in</a>
     </nav>
   </header>
 
-  <!-- ── Main ── -->
   <main>
-
-    <!-- Peuplé dynamiquement par displayPlaceDetails() -->
-    <div id="place-details"></div>
-
-    <!-- Section Add Review — visible seulement si connecté -->
+    <div id="place-details">
+      <div class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Loading place details…</p>
+      </div>
+    </div>
     <div id="add-review" style="display: none;">
       <h2 class="section-title">Add a Review</h2>
       <a id="add-review-link" href="#" class="add-review-btn">Write a review</a>
     </div>
-
   </main>
 
-  <!-- ── Footer ── -->
   <footer>
     <p>&copy; 2024 HBnB. All rights reserved.</p>
   </footer>
