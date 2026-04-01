@@ -1,23 +1,23 @@
 'use strict';
 
-/* Photos Unsplash libres de droits pour la page détail */
+/* Photos Unsplash — lieux & destinations (une seule déclaration) */
 const DETAIL_PHOTOS = [
-  'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&q=80',
-  'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=1200&q=80',
-  'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=1200&q=80',
-  'https://images.unsplash.com/photo-1505873242700-f289a29e1e0f?w=1200&q=80',
-  'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80',
-  'https://images.unsplash.com/photo-1587381420270-3e1a5b9e6904?w=1200&q=80',
-];
-
-
-/* Photos Unsplash pour les places */
-const DETAIL_PHOTOS = [
-  'https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=1200&q=80',
-  'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80',
-  'https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=1200&q=80',
-  'https://images.unsplash.com/photo-1505916349660-8d91a99f0e5c?w=1200&q=80',
-  'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80',
+  /* Paris — Tour Eiffel */
+  'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80',
+  /* New York — Manhattan skyline */
+  'https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?w=1200&q=80',
+  /* Tokyo — vue urbaine de nuit */
+  'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&q=80',
+  /* Barcelone — architecture */
+  'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=80',
+  /* Santorini — maisons blanches */
+  'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=1200&q=80',
+  /* Londres — Tower Bridge */
+  'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=1200&q=80',
+  /* Bali — rizières en terrasse */
+  'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=80',
+  /* Marrakech — riad & souk */
+  'https://images.unsplash.com/photo-1553603227-2358aabe821e?w=1200&q=80',
 ];
 
 function getPlaceIdFromURL() {
