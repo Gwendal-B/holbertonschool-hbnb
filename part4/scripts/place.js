@@ -39,22 +39,23 @@ function checkAuthentication() {
   const addReviewSection = document.getElementById('add-review');
 
   if (!token) {
-    loginLink.style.display   = 'block';
-    loginLink.textContent     = 'Login';
-    loginLink.href            = 'login.html';
-    addReviewSection.style.display = 'none';
+    loginLink.style.display        = 'block';
+    loginLink.textContent          = 'Login';
+    loginLink.href                 = 'login.html';
+    addReviewSection.style.display = 'none';  // cache "Write a review"
   } else {
-    loginLink.style.display   = 'block';
-    loginLink.textContent     = 'Logout';
-    loginLink.href            = '#';
-    loginLink.onclick         = (e) => {
+    loginLink.style.display        = 'block';
+    loginLink.textContent          = 'Logout';
+    loginLink.href                 = '#';
+    loginLink.onclick = (e) => {
       e.preventDefault();
       document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       window.location.href = 'index.html';
     };
     addReviewSection.style.display = 'block';
-    fetchPlaceDetails(token, placeId);
   }
+  // Toujours fetch les détails, connecté ou non
+  fetchPlaceDetails(token, placeId);
 }
 
 /* ─────────────────────────────────────────────

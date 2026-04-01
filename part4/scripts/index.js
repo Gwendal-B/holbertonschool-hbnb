@@ -37,7 +37,7 @@ function checkAuthentication() {
     loginLink.style.display = 'block';
     loginLink.textContent   = 'Logout';
     loginLink.href          = '#';
-    loginLink.onclick       = (e) => {
+    loginLink.onclick = (e) => {
       e.preventDefault();
       document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
       window.location.reload();
