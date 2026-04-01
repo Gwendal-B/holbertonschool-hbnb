@@ -1,18 +1,10 @@
-/**
- * index.js — Task 2 : List of Places (redesign nature/voyage)
- */
-
 'use strict';
 
-/**
- * Retourne une photo Unsplash cohérente avec le nom du logement.
- * Chaque catégorie a une photo distincte pour éviter les doublons.
- */
 function getPhotoForPlace(place) {
   const name = (place.title || place.name || '').toLowerCase();
   const id = String(place.id || '');
 
-  if (name.includes('cozy apartement in paris')) {
+  if (name.includes('cozy apartment in paris') || name.includes('cozy apartement in paris')) {
     return 'images/places/cozy-apartment-paris.jpg';
   }
 
@@ -47,7 +39,7 @@ function getPhotoForPlace(place) {
 
 function getCookie(name) {
   const cookies = document.cookie.split('; ');
-  const found   = cookies.find(row => row.startsWith(name + '='));
+  const found = cookies.find(row => row.startsWith(name + '='));
   return found ? decodeURIComponent(found.split('=')[1]) : null;
 }
 
@@ -55,15 +47,29 @@ function checkAuthentication() {
   const token = getCookie('token');
   const loginLink = document.getElementById('login-link');
 
+  if (!loginLink) {
+    fetchPlaces(token);
+    return;
+  }
+
   if (!token) {
-    loginLink.style.display = 'block';
+    loginLink.style.display = 'inline-block';
+    loginLink.textContent = 'Login';
+    loginLink.href = 'login.html';
+    loginLink.onclick = null;
   } else {
-    loginLink.style.display = 'none';
+    loginLink.style.display = 'inline-block';
+    loginLink.textContent = 'Logout';
+    loginLink.href = '#';
+    loginLink.onclick = function (e) {
+      e.preventDefault();
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      window.location.reload();
+    };
   }
 
   fetchPlaces(token);
 }
-
 
 async function fetchPlaces(token) {
   try {
@@ -80,7 +86,9 @@ async function fetchPlaces(token) {
       headers
     });
 
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
 
     const places = await response.json();
     displayPlaces(places);
@@ -123,13 +131,13 @@ function displayPlaces(places) {
   });
 }
 
-/* Filtre prix côté client */
 document.getElementById('price-filter').addEventListener('change', (event) => {
   const selected = event.target.value;
-  const cards    = document.querySelectorAll('.place-card');
+  const cards = document.querySelectorAll('.place-card');
 
   cards.forEach(card => {
     const cardPrice = parseFloat(card.dataset.price);
+
     if (selected === 'All') {
       card.style.display = '';
     } else {
@@ -144,6 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function escHtml(str) {
   return String(str ?? '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }

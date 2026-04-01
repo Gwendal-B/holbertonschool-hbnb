@@ -23,6 +23,9 @@
   --text-dark:   #1a2018;
   --text-mid:    #4a5548;
   --text-light:  #8a9988;
+  --surface:     #fffef9;
+  --text-muted:  #8a9988;
+  --border-soft: #d8ddd2;
 
   --radius:    10px;
   --card-pad:  10px;
@@ -416,6 +419,17 @@ main {
   padding: var(--card-pad);
   margin-bottom: var(--card-mar);
   animation: fadeUp 0.5s ease both;
+}
+
+.place-details-img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: block;
+  background: #e9e6df;
 }
 
 .place-details-hero {

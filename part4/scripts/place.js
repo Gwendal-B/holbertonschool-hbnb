@@ -1,14 +1,10 @@
 'use strict';
 
-/**
- * Retourne un tableau de 3 photos Unsplash cohérentes avec le logement.
- * La première photo est la principale (hero), les suivantes complètent la galerie.
- */
 function getPhotoForPlace(place) {
   const name = (place.title || place.name || '').toLowerCase();
   const id = String(place.id || '');
 
-  if (name.includes('cozy apartement in paris')) {
+  if (name.includes('cozy apartment in paris') || name.includes('cozy apartement in paris')) {
     return 'images/places/cozy-apartment-paris.jpg';
   }
 
@@ -48,7 +44,7 @@ function getPlaceIdFromURL() {
 
 function getCookie(name) {
   const cookies = document.cookie.split('; ');
-  const found   = cookies.find(row => row.startsWith(name + '='));
+  const found = cookies.find(row => row.startsWith(name + '='));
   return found ? decodeURIComponent(found.split('=')[1]) : null;
 }
 
@@ -57,12 +53,26 @@ function checkAuthentication() {
   const addReviewSection = document.getElementById('add-review');
   const loginLink = document.getElementById('login-link');
 
-  if (!token) {
-    addReviewSection.style.display = 'none';
-    loginLink.style.display = 'block';
-  } else {
-    addReviewSection.style.display = 'block';
-    loginLink.style.display = 'none';
+  if (loginLink) {
+    if (!token) {
+      loginLink.style.display = 'inline-block';
+      loginLink.textContent = 'Login';
+      loginLink.href = 'login.html';
+      loginLink.onclick = null;
+    } else {
+      loginLink.style.display = 'inline-block';
+      loginLink.textContent = 'Logout';
+      loginLink.href = '#';
+      loginLink.onclick = function (e) {
+        e.preventDefault();
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = 'index.html';
+      };
+    }
+  }
+
+  if (addReviewSection) {
+    addReviewSection.style.display = token ? 'block' : 'none';
   }
 
   fetchPlaceDetails(token, placeId);
@@ -83,7 +93,9 @@ async function fetchPlaceDetails(token, placeId) {
       headers
     });
 
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
 
     const place = await response.json();
     displayPlaceDetails(place);
@@ -101,7 +113,7 @@ function displayPlaceDetails(place) {
   detailsEl.innerHTML = '';
 
   const price = place.price_by_night ?? place.price ?? '?';
-  const name  = place.title || place.name || 'Unknown';
+  const name = place.title || place.name || 'Unknown';
   const imageUrl = getPhotoForPlace(place);
 
   document.title = `HBnB — ${name}`;
@@ -111,20 +123,13 @@ function displayPlaceDetails(place) {
     reviewLink.href = `add_review.html?id=${encodeURIComponent(place.id)}`;
   }
 
-  /* Galerie de photos */
-  const photos = place.image_url
-    ? [place.image_url, ...getPhotosForPlace(name).slice(1)]
-    : getPhotosForPlace(name);
-
-  /* Amenities */
   const amenitiesHTML = (place.amenities && place.amenities.length)
     ? place.amenities.map(a => `<li class="amenity-tag">${escHtml(a.name || a)}</li>`).join('')
     : '<li class="amenity-tag text-muted">None listed</li>';
 
-  /* Reviews */
   const reviewsHTML = (place.reviews && place.reviews.length)
     ? place.reviews.map(r => {
-        const stars  = '★'.repeat(r.rating ?? 0) + '☆'.repeat(5 - (r.rating ?? 0));
+        const stars = '★'.repeat(r.rating ?? 0) + '☆'.repeat(5 - (r.rating ?? 0));
         const author = r.user_name || r.user?.first_name || 'Anonymous';
         return `
           <div class="review-card">
@@ -137,30 +142,14 @@ function displayPlaceDetails(place) {
       }).join('')
     : '<p class="text-muted" style="font-style:italic;">No reviews yet — be the first to share your experience.</p>';
 
-  /* Galerie HTML */
-  const galleryDotsHTML = photos.map((_, i) =>
-    `<button class="gallery-dot ${i === 0 ? 'active' : ''}" data-index="${i}" aria-label="Photo ${i + 1}"></button>`
-  ).join('');
-
-  const galleryImgsHTML = photos.map((url, i) =>
-    `<img class="gallery-slide ${i === 0 ? 'active' : ''}"
-          src="${url}"
-          alt="${escHtml(name)} — photo ${i + 1}"
-          loading="${i === 0 ? 'eager' : 'lazy'}" />`
-  ).join('');
-
   const section = document.createElement('div');
   section.innerHTML = `
     <div class="place-details">
+      <img class="place-details-img" src="${imageUrl}" alt="${escHtml(name)}" />
 
-      <!-- Galerie photos -->
-      <div class="gallery">
-        <div class="gallery-track">
-          ${galleryImgsHTML}
-        </div>
-        <button class="gallery-btn gallery-btn-prev" aria-label="Photo précédente">&#8249;</button>
-        <button class="gallery-btn gallery-btn-next" aria-label="Photo suivante">&#8250;</button>
-        <div class="gallery-dots">${galleryDotsHTML}</div>
+      <div class="place-details-header">
+        <h1 class="place-details-title">${escHtml(name)}</h1>
+        <span class="place-price-tag">$${price} / night</span>
       </div>
 
       <div class="place-info">
@@ -192,7 +181,6 @@ function displayPlaceDetails(place) {
 
       <h2 class="section-title">Amenities</h2>
       <ul class="amenities-list">${amenitiesHTML}</ul>
-
     </div>
 
     <h2 class="section-title" style="margin-top:2.5rem;">Guest reviews</h2>
@@ -200,50 +188,22 @@ function displayPlaceDetails(place) {
   `;
 
   detailsEl.appendChild(section);
-
-  /* Logique de la galerie */
-  initGallery(section, photos.length);
-}
-
-function initGallery(container, total) {
-  let current = 0;
-
-  const slides = container.querySelectorAll('.gallery-slide');
-  const dots   = container.querySelectorAll('.gallery-dot');
-  const prev   = container.querySelector('.gallery-btn-prev');
-  const next   = container.querySelector('.gallery-btn-next');
-
-  function goTo(index) {
-    slides[current].classList.remove('active');
-    dots[current].classList.remove('active');
-    current = (index + total) % total;
-    slides[current].classList.add('active');
-    dots[current].classList.add('active');
-  }
-
-  prev.addEventListener('click', () => goTo(current - 1));
-  next.addEventListener('click', () => goTo(current + 1));
-  dots.forEach(dot => dot.addEventListener('click', () => goTo(+dot.dataset.index)));
-
-  /* Swipe tactile */
-  let startX = 0;
-  const track = container.querySelector('.gallery-track');
-  track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
-  track.addEventListener('touchend',   e => {
-    const diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
-  });
 }
 
 function escHtml(str) {
   return String(str ?? '')
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 const placeId = getPlaceIdFromURL();
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (!placeId) { window.location.href = 'index.html'; return; }
+  if (!placeId) {
+    window.location.href = 'index.html';
+    return;
+  }
   checkAuthentication();
 });
