@@ -148,6 +148,9 @@ class HBnBFacade:
             price=place_data['price'],
             latitude=place_data['latitude'],
             longitude=place_data['longitude'],
+            city=place_data.get('city', ''),
+            country=place_data.get('country', 'France'),
+            max_guests=place_data.get('max_guests', 1),
             owner=owner
         )
 
@@ -170,10 +173,26 @@ class HBnBFacade:
         if not place:
             return None
 
-        allowed_fields = {'title', 'description', 'price', 'latitude', 'longitude'}
+        amenities_ids = place_data.pop('amenities', None)
+
+        allowed_fields = {
+            'title', 'description', 'price', 'latitude', 'longitude',
+            'city', 'country', 'max_guests'
+        }
         filtered_data = {key: value for key, value in place_data.items() if key in allowed_fields}
 
         place.update(filtered_data)
+
+        if amenities_ids is not None:
+            place.amenities = []
+            for amenity_id in amenities_ids:
+                amenity = self.amenity_repo.get(amenity_id)
+                if amenity:
+                    place.add_amenity(amenity)
+
+        from app import db
+        db.session.commit()
+
         return self.place_repo.get(place_id)
 
     def delete_place(self, place_id):

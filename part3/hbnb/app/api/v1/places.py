@@ -22,22 +22,27 @@ place_model = api.model('Place', {
     'price': fields.Float(required=True, description='Price per night'),
     'latitude': fields.Float(required=True, description='Latitude of the place'),
     'longitude': fields.Float(required=True, description='Longitude of the place'),
+    'city': fields.String(required=True, description='City of the place'),
+    'country': fields.String(required=True, description='Country of the place'),
+    'max_guests': fields.Integer(required=True, description='Maximum number of guests'),
     'owner_id': fields.String(required=True, description='ID of the owner'),
-    'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
+    'amenities': fields.List(fields.String, required=True, description="List of amenities IDs")
 })
 
-
 place_update_model = api.model('PlaceUpdate', {
-    'title':       fields.String(description='Title of the place'),
+    'title': fields.String(description='Title of the place'),
     'description': fields.String(description='Description of the place'),
-    'price':       fields.Float(description='Price per night'),
-    'latitude':    fields.Float(description='Latitude of the place'),
-    'longitude':   fields.Float(description='Longitude of the place'),
+    'price': fields.Float(description='Price per night'),
+    'latitude': fields.Float(description='Latitude of the place'),
+    'longitude': fields.Float(description='Longitude of the place'),
+    'city': fields.String(description='City of the place'),
+    'country': fields.String(description='Country of the place'),
+    'max_guests': fields.Integer(description='Maximum number of guests'),
+    'amenities': fields.List(fields.String, description='List of amenity IDs')
 })
 
 
 def marshal_place(place):
-    """Sérialise un objet Place en dict JSON."""
     return {
         "id": place.id,
         "title": place.title,
@@ -45,6 +50,9 @@ def marshal_place(place):
         "price": place.price,
         "latitude": place.latitude,
         "longitude": place.longitude,
+        "city": place.city,
+        "country": place.country,
+        "max_guests": place.max_guests,
         "owner": {
             "id": place.owner.id,
             "first_name": place.owner.first_name,
@@ -52,7 +60,7 @@ def marshal_place(place):
             "email": place.owner.email
         },
         "amenities": [{"id": a.id, "name": a.name} for a in place.amenities],
-        "reviews": [           # ← ajouter ça
+        "reviews": [
             {
                 "id": r.id,
                 "text": r.text,
@@ -69,7 +77,6 @@ def marshal_place(place):
 class PlaceList(Resource):
     @api.response(200, 'List of places retrieved successfully')
     def get(self):
-        """Retrieve a list of all places"""
         return [marshal_place(p) for p in facade.get_all_places()], 200
 
     @jwt_required()
@@ -80,12 +87,10 @@ class PlaceList(Resource):
     @api.response(401, 'Authentication required')
     @api.response(403, 'Unauthorized action')
     def post(self):
-        """Register a new place"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
         data = api.payload
 
-        # L'owner_id doit correspondre à l'utilisateur connecté (sauf admin)
         if data.get('owner_id') != current_user_id and not claims.get('is_admin', False):
             return {'error': 'Unauthorized action — owner_id must match your user ID'}, 403
 
@@ -101,7 +106,6 @@ class PlaceResource(Resource):
     @api.response(200, 'Place details retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):
-        """Get place details by ID"""
         place = facade.get_place(place_id)
         if not place:
             api.abort(404, "Place not found")
@@ -116,7 +120,6 @@ class PlaceResource(Resource):
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'Place not found')
     def put(self, place_id):
-        """Update a place's information"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
 
@@ -127,15 +130,20 @@ class PlaceResource(Resource):
         if place.owner.id != current_user_id and not claims.get('is_admin', False):
             return {'error': 'Unauthorized action'}, 403
 
-        allowed_fields = {'title', 'description', 'price', 'latitude', 'longitude'}
+        allowed_fields = {
+            'title', 'description', 'price', 'latitude', 'longitude',
+            'city', 'country', 'max_guests', 'amenities'
+        }
         data = {key: value for key, value in api.payload.items() if key in allowed_fields}
 
         try:
             updated_place = facade.update_place(place_id, data)
         except ValueError as e:
             return {"error": str(e)}, 400
+
         if not updated_place:
             api.abort(404, "Place not found")
+
         return marshal_place(updated_place), 200
 
     @jwt_required()
@@ -145,7 +153,6 @@ class PlaceResource(Resource):
     @api.response(403, 'Unauthorized action')
     @api.response(404, 'Place not found')
     def delete(self, place_id):
-        """Delete a place — only the owner or admin"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
 
@@ -165,7 +172,6 @@ class PlaceReviewList(Resource):
     @api.response(200, 'List of reviews for the place retrieved successfully')
     @api.response(404, 'Place not found')
     def get(self, place_id):
-        """Get all reviews for a specific place"""
         if not facade.get_place(place_id):
             api.abort(404, "Place not found")
         reviews = facade.get_reviews_by_place(place_id)
