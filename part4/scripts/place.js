@@ -107,35 +107,40 @@ function getCookie(name) {
 }
 
 function checkAuthentication() {
-  const token            = getCookie('token');
+  const token = getCookie('token');
   const addReviewSection = document.getElementById('add-review');
-  const loginLink        = document.getElementById('login-link');
+  const loginLink = document.getElementById('login-link');
 
   if (!token) {
     addReviewSection.style.display = 'none';
-    loginLink.style.display        = 'block';
+    loginLink.style.display = 'block';
   } else {
     addReviewSection.style.display = 'block';
-    loginLink.style.display        = 'none';
-    fetchPlaceDetails(token, placeId);
+    loginLink.style.display = 'none';
   }
+
+  fetchPlaceDetails(token, placeId);
 }
 
 async function fetchPlaceDetails(token, placeId) {
   try {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+      headers
     });
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const place = await response.json();
     displayPlaceDetails(place);
-
   } catch (err) {
     document.getElementById('place-details').innerHTML = `
       <div class="empty-state">

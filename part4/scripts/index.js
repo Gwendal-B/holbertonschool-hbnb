@@ -62,32 +62,38 @@ function getCookie(name) {
 }
 
 function checkAuthentication() {
-  const token     = getCookie('token');
+  const token = getCookie('token');
   const loginLink = document.getElementById('login-link');
 
   if (!token) {
     loginLink.style.display = 'block';
   } else {
     loginLink.style.display = 'none';
-    fetchPlaces(token);
   }
+
+  fetchPlaces(token);
 }
+
 
 async function fetchPlaces(token) {
   try {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch('http://127.0.0.1:5000/api/v1/places', {
       method: 'GET',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+      headers
     });
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const places = await response.json();
     displayPlaces(places);
-
   } catch (err) {
     document.getElementById('places-list').innerHTML = `
       <div class="empty-state">
