@@ -4,95 +4,41 @@
  * Retourne un tableau de 3 photos Unsplash cohérentes avec le logement.
  * La première photo est la principale (hero), les suivantes complètent la galerie.
  */
-function getPhotosForPlace(name) {
-  const n = (name || '').toLowerCase();
+function getPhotoForPlace(place) {
+  const name = (place.title || place.name || '').toLowerCase();
+  const id = String(place.id || '');
 
-  // Chalet / montagne / ski / chamonix
-  if (/chalet|montagne|ski|alpes?|chamonix|neige|piste/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=80', // chalet ext enneigé
-      'https://images.unsplash.com/photo-1520984032042-162d526883e0?w=1200&q=80', // intérieur chalet bois
-      'https://images.unsplash.com/photo-1605537964076-4b9e85e7e73a?w=1200&q=80', // salon chalet feu de cheminée
-    ];
+  if (name.includes('cozy apartement in paris')) {
+    return 'images/places/cozy-apartment-paris.jpg';
+  }
 
-  // Maison bretonne / quiberon / bord de mer
-  if (/bretonne|quiberon|biarr/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=1200&q=80', // maison côtière
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', // plage bretagne
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80', // chambre vue mer
-    ];
+  if (name.includes('studio cosy au coeur de paris')) {
+    return 'images/places/studio-cosy-paris.jpg';
+  }
 
-  // Villa / piscine / nice / provence
-  if (/villa|piscine|luxe|nice|provence|sud|cannes|antibes/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=80', // villa piscine ext
-      'https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=1200&q=80', // piscine intérieure villa
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80', // salon villa luxe
-    ];
+  if (name.includes('villa avec piscine vue mer') || name.includes('nice')) {
+    return 'images/places/villa-piscine-vue-mer-nice.jpg';
+  }
 
-  // Haussmannien / bordeaux
-  if (/haussmann|bordeaux|classique|bourgeois/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80', // salon haussmannien
-      'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&q=80', // cuisine haussmannienne
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80', // chambre élégante
-    ];
+  if (name.includes('appartement haussmannien bordeaux')) {
+    return 'images/places/appartement-haussmannien-bordeaux.jpg';
+  }
 
-  // Loft / industriel / lyon
-  if (/loft|industriel|design|lyon|atelier/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80', // loft open space
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80', // cuisine industrielle
-      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80', // salon loft design
-    ];
+  if (name.includes('chalet au pied des pistes') || name.includes('chamonix')) {
+    return 'images/places/chalet-pied-des-pistes-chamonix.jpg';
+  }
 
-  // Studio / cosy / coeur de paris
-  if (/studio|cosy|coeur|centre/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1200&q=80', // studio parisien
-      'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=1200&q=80', // coin bureau studio
-      'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=80', // cuisine studio moderne
-    ];
+  if (name.includes('loft industriel design') || name.includes('vieux lyon')) {
+    return 'images/places/loft-industriel-vieux-lyon.jpg';
+  }
 
-  // Cozy apartment / Paris
-  if (/cozy|apartment|paris/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&q=80', // appart parisien lumineux
-      'https://images.unsplash.com/photo-1560184897-ae75f418493e?w=1200&q=80', // chambre appart parisien
-      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&q=80', // salon cozy appart
-    ];
+  if (name.includes('maison bretonne bord de mer') && name.includes('quiberon')) {
+    return id.endsWith('2')
+      ? 'images/places/maison-bretonne-quiberon-2.jpg'
+      : 'images/places/maison-bretonne-quiberon-1.jpg';
+  }
 
-  // Appartement générique
-  if (/appartement|appart|flat/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80', // appart moderne
-      'https://images.unsplash.com/photo-1560185127-6a28f73e7b5d?w=1200&q=80', // chambre moderne
-      'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1200&q=80', // cuisine appart
-    ];
-
-  // Mer / plage générique
-  if (/mer|plage|côte|bord/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&q=80', // terrasse vue mer
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80', // plage
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80', // chambre vue mer
-    ];
-
-  // Maison générique
-  if (/maison|house|home/.test(n))
-    return [
-      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&q=80', // maison ext
-      'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80', // salon maison
-      'https://images.unsplash.com/photo-1556020685-ae41abfc9365?w=1200&q=80', // cuisine maison
-    ];
-
-  // Fallback
-  return [
-    'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200&q=80',
-    'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=1200&q=80',
-    'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
-  ];
+  return 'images/places/default-place.jpg';
 }
 
 function getPlaceIdFromURL() {
@@ -156,6 +102,7 @@ function displayPlaceDetails(place) {
 
   const price = place.price_by_night ?? place.price ?? '?';
   const name  = place.title || place.name || 'Unknown';
+  const imageUrl = getPhotoForPlace(place);
 
   document.title = `HBnB — ${name}`;
 
