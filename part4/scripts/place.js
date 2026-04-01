@@ -63,12 +63,12 @@ function checkAuthentication() {
    ───────────────────────────────────────────── */
 async function fetchPlaceDetails(token, placeId) {
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
     const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
       method: 'GET',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${token}`
-      }
+      headers: headers
     });
 
     if (!response.ok) {
