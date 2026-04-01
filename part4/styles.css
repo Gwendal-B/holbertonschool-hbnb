@@ -787,3 +787,95 @@ main {
   .form-card { padding: 1.8rem 1.4rem; }
   nav a:not(.login-button) { display: none; }
 }
+/* ── Photo Gallery (place detail page) ── */
+.gallery {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  background: var(--mist);
+  aspect-ratio: 16 / 9;
+}
+
+.gallery-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.gallery-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+
+.gallery-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Prev / Next buttons */
+.gallery-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.85);
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: background 0.2s, transform 0.15s;
+  z-index: 2;
+}
+
+.gallery-btn:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.gallery-btn-prev { left: 14px; }
+.gallery-btn-next { right: 14px; }
+
+/* Dots */
+.gallery-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.gallery-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgba(255,255,255,0.4);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.gallery-dot.active {
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .gallery { aspect-ratio: 4 / 3; border-radius: 10px; }
+  .gallery-btn { width: 36px; height: 36px; font-size: 1.3rem; }
+}
