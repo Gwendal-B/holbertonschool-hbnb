@@ -249,6 +249,10 @@ class HBnBFacade:
         filtered_data = {key: value for key, value in review_data.items() if key in allowed_fields}
 
         review.update(filtered_data)
+
+        from app import db
+        db.session.commit()
+
         return self.review_repo.get(review_id)
 
     def delete_review(self, review_id):

@@ -23,6 +23,7 @@ def marshal_review(review):
         "text":     review.text,
         "rating":   review.rating,
         "user_id":  review.user.id,
+        "user_name": f"{review.user.first_name} {review.user.last_name}",
         "place_id": review.place.id
     }
 
@@ -169,3 +170,4 @@ class ReviewResource(Resource):
 
         facade.delete_review(review_id)
         return {"message": f"Review {review_id} deleted"}, 200
+    
