@@ -10,6 +10,28 @@ function getCookie(name) {
   const found = cookies.find(row => row.startsWith(name + '='));
   return found ? decodeURIComponent(found.split('=')[1]) : null;
 }
+/* Option Delete Review*/
+async function fetchCurrentUser() {
+  const token = getCookie('token');
+
+  if (!token) return null;
+
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/v1/auth/me', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) return null;
+
+    return await response.json();
+  } catch (_) {
+    return null;
+  }
+}
 
 function getLocationLabel(place) {
   const city = place.city || '';
@@ -112,17 +134,20 @@ async function fetchPlaceDetails(token, placeId) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
-      method: 'GET',
-      headers
-    });
+    const [placeResponse, currentUser] = await Promise.all([
+      fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+        method: 'GET',
+        headers
+      }),
+      fetchCurrentUser()
+    ]);
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    if (!placeResponse.ok) {
+      throw new Error(`HTTP ${placeResponse.status}`);
     }
 
-    const place = await response.json();
-    displayPlaceDetails(place);
+    const place = await placeResponse.json();
+    displayPlaceDetails(place, currentUser);
   } catch (err) {
     document.getElementById('place-details').innerHTML = `
       <div class="empty-state">
@@ -163,7 +188,7 @@ function buildGalleryHTML(place, name) {
   `;
 }
 
-function displayPlaceDetails(place) {
+function displayPlaceDetails(place, currentUser = null) {
   const detailsEl = document.getElementById('place-details');
   detailsEl.innerHTML = '';
 
@@ -199,13 +224,25 @@ function displayPlaceDetails(place) {
         const stars = '★'.repeat(safeRating) + '☆'.repeat(5 - safeRating);
         const author = r.user_name || r.user?.first_name || 'Anonymous';
 
+        const canManageReview = currentUser &&
+        (currentUser.is_admin || currentUser.id === r.user_id);
+
         return `
           <div class="review-card">
             <div class="review-card-header">
               <span class="review-author">${escHtml(author)}</span>
               <span class="review-rating">${stars}</span>
             </div>
+
             <p class="review-text">${escHtml(r.text || r.comment || '')}</p>
+
+            ${canManageReview ? `
+              <div class="review-actions">
+                <button class="edit-review-btn" data-review-id="${r.id}">
+                  Edit review
+                </button>
+              </div>
+            ` : ''}
           </div>
         `;
       }).join('')

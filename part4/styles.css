@@ -649,6 +649,30 @@ main {
   box-shadow: 0 4px 20px rgba(196,113,74,0.4);
 }
 
+/* ── Add Delete Button (for Reviews) ── */
+.review-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit-review-btn {
+  border: 1px solid #c9cfbf;
+  background: #fffdf7;
+  color: #2c3b2f;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.edit-review-btn:hover {
+  background: #f3efe5;
+  transform: translateY(-1px);
+}
+
 /* ── Forms ── */
 .form-container {
   max-width: 480px;
