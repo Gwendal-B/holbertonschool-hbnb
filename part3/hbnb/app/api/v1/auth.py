@@ -63,22 +63,24 @@ class Login(Resource):
         )
         return {'access_token': access_token}, 200
 
-@api.route('/<review_id>')
-class ReviewResource(Resource):
+
+@api.route('/me')
+class Me(Resource):
+    "Préparation pour le bouton delete"
     @jwt_required()
-    @api.response(200, 'Review deleted successfully')
-    @api.response(403, 'Unauthorized action')
-    @api.response(404, 'Review not found')
-    def delete(self, review_id):
+    def get(self):
+        """Return the currently authenticated user"""
         current_user_id = get_jwt_identity()
         claims = get_jwt()
 
-        review = facade.get_review(review_id)
-        if not review:
-            api.abort(404, "Review not found")
+        user = facade.get_user(current_user_id)
+        if not user:
+            return {'error': 'User not found'}, 404
 
-        if review.user.id != current_user_id and not claims.get('is_admin', False):
-            return {'error': 'Unauthorized action'}, 403
-
-        facade.delete_review(review_id)
-        return {'message': f'Review {review_id} deleted'}, 200
+        return {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'is_admin': claims.get('is_admin', False)
+        }, 200
