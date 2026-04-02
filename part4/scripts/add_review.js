@@ -1,86 +1,67 @@
-/**
- * add_review.js — Task 4 : Add Review Form
- *
- * Fonctions exactes demandées par le cahier des charges :
- *   - getCookie(name)
- *   - checkAuthentication()     → retourne le token ou redirect
- *   - getPlaceIdFromURL()
- *   - submitReview(token, placeId, reviewText)
- *   - handleResponse(response)
- */
-
 'use strict';
 
-/* ─────────────────────────────────────────────
-   Récupère la valeur d'un cookie par son nom
-   ───────────────────────────────────────────── */
 function getCookie(name) {
   const cookies = document.cookie.split('; ');
-  const found   = cookies.find(row => row.startsWith(name + '='));
+  const found = cookies.find(row => row.startsWith(name + '='));
   return found ? decodeURIComponent(found.split('=')[1]) : null;
 }
 
-/* ─────────────────────────────────────────────
-   Vérifie l'auth — redirige si pas de token
-   Retourne le token si présent
-   ───────────────────────────────────────────── */
 function checkAuthentication() {
   const token = getCookie('token');
   if (!token) {
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
   }
   return token;
 }
 
-/* ─────────────────────────────────────────────
-   Extrait le place ID depuis ?id=... dans l'URL
-   ───────────────────────────────────────────── */
 function getPlaceIdFromURL() {
   const params = new URLSearchParams(window.location.search);
-  return params.get('id');
+
+  // accepte les 2 formats : ?id=... ou ?place_id=...
+  return params.get('id') || params.get('place_id');
 }
 
-/* ─────────────────────────────────────────────
-   Envoie le review via POST /places/:id/reviews
-   ───────────────────────────────────────────── */
 async function submitReview(token, placeId, reviewText) {
-  const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews`, {
+  const response = await fetch('http://127.0.0.1:5000/api/v1/reviews', {
     method: 'POST',
     headers: {
-      'Content-Type':  'application/json',
+      'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({
-      text:   reviewText,
+      text: reviewText,
       rating: parseInt(document.getElementById('rating').value, 10),
       place_id: placeId
     })
   });
 
-  handleResponse(response);
+  await handleResponse(response, placeId);
 }
 
-/* ─────────────────────────────────────────────
-   Gère la réponse de l'API
-   ───────────────────────────────────────────── */
-function handleResponse(response) {
+async function handleResponse(response, placeId) {
   if (response.ok) {
     alert('Review submitted successfully!');
-    document.getElementById('review-form').reset();   // vide le formulaire
+    document.getElementById('review-form').reset();
+    window.location.href = `place.html?id=${encodeURIComponent(placeId)}`;
   } else {
-    alert('Failed to submit review');
+    let message = 'Failed to submit review';
+    try {
+      const err = await response.json();
+      message = err.message || err.error || err.msg || JSON.stringify(err);
+    } catch (_) {
+      // ignore
+    }
+    alert(message);
   }
 }
 
-/* ─────────────────────────────────────────────
-   Point d'entrée
-   ───────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   const reviewForm = document.getElementById('review-form');
-  const token      = checkAuthentication();   // redirect si pas connecté
-  const placeId    = getPlaceIdFromURL();
+  const token = checkAuthentication();
+  const placeId = getPlaceIdFromURL();
 
   if (!placeId) {
+    alert('Missing place ID in URL.');
     window.location.href = 'index.html';
     return;
   }
@@ -90,9 +71,15 @@ document.addEventListener('DOMContentLoaded', () => {
       event.preventDefault();
 
       const reviewText = document.getElementById('review-text').value.trim();
+      const rating = document.getElementById('rating').value;
 
       if (!reviewText) {
         alert('Please write your review before submitting.');
+        return;
+      }
+
+      if (!rating) {
+        alert('Please select a rating.');
         return;
       }
 
