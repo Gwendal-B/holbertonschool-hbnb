@@ -1070,3 +1070,47 @@ main {
     height: 170px;
   }
 }
+
+.review-edit {
+  margin-top: 0.8rem;
+  padding: 0.8rem;
+  background: #f5f2e8;
+  border-radius: 10px;
+}
+
+.review-edit.hidden {
+  display: none;
+}
+
+.review-edit textarea {
+  width: 100%;
+  min-height: 60px;
+  margin-bottom: 0.5rem;
+}
+
+.review-edit select {
+  margin-bottom: 0.5rem;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.save-review-btn {
+  background: #86a37c;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.delete-review-btn {
+  background: #c46b5e;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+}

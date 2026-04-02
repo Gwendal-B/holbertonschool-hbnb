@@ -239,8 +239,25 @@ function displayPlaceDetails(place, currentUser = null) {
             ${canManageReview ? `
               <div class="review-actions">
                 <button class="edit-review-btn" data-review-id="${r.id}">
-                  Edit review
+                  Edit
                 </button>
+
+                <div class="review-edit hidden" id="edit-${r.id}">
+                  <textarea class="edit-text">${escHtml(r.text)}</textarea>
+
+                  <select class="edit-rating">
+                    ${[1,2,3,4,5].map(n => `
+                      <option value="${n}" ${n === r.rating ? 'selected' : ''}>
+                        ${n}
+                      </option>
+                    `).join('')}
+                  </select>
+
+                  <div class="edit-actions">
+                    <button class="save-review-btn" data-review-id="${r.id}">Save</button>
+                    <button class="delete-review-btn" data-review-id="${r.id}">Delete</button>
+                  </div>
+                </div>
               </div>
             ` : ''}
           </div>
@@ -299,6 +316,7 @@ function displayPlaceDetails(place, currentUser = null) {
   detailsEl.appendChild(section);
   applyImageFallbacks();
   initLightbox();
+  initReviewActions(currentUser);
 }
 
 function applyImageFallbacks() {
@@ -412,3 +430,65 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   checkAuthentication();
 });
+
+function initReviewActions(currentUser) {
+  const token = getCookie('token');
+  if (!token) return;
+
+  // Toggle edit
+  document.querySelectorAll('.edit-review-btn').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.reviewId;
+      const editBox = document.getElementById(`edit-${id}`);
+      editBox.classList.toggle('hidden');
+    };
+  });
+
+  // Save review
+  document.querySelectorAll('.save-review-btn').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.dataset.reviewId;
+      const container = document.getElementById(`edit-${id}`);
+
+      const text = container.querySelector('.edit-text').value.trim();
+      const rating = parseInt(container.querySelector('.edit-rating').value, 10);
+
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ text, rating })
+      });
+
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert('Failed to update review');
+      }
+    };
+  });
+
+  // Delete review
+  document.querySelectorAll('.delete-review-btn').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.dataset.reviewId;
+
+      if (!confirm('Delete this review?')) return;
+
+      const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert('Failed to delete review');
+      }
+    };
+  });
+}
