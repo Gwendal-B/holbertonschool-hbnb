@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from app.services import facade
 
 api = Namespace('auth', description='Authentication operations')
@@ -62,3 +62,23 @@ class Login(Resource):
             additional_claims={"is_admin": user.is_admin}
         )
         return {'access_token': access_token}, 200
+
+@api.route('/<review_id>')
+class ReviewResource(Resource):
+    @jwt_required()
+    @api.response(200, 'Review deleted successfully')
+    @api.response(403, 'Unauthorized action')
+    @api.response(404, 'Review not found')
+    def delete(self, review_id):
+        current_user_id = get_jwt_identity()
+        claims = get_jwt()
+
+        review = facade.get_review(review_id)
+        if not review:
+            api.abort(404, "Review not found")
+
+        if review.user.id != current_user_id and not claims.get('is_admin', False):
+            return {'error': 'Unauthorized action'}, 403
+
+        facade.delete_review(review_id)
+        return {'message': f'Review {review_id} deleted'}, 200
