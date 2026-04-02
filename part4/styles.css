@@ -1071,46 +1071,141 @@ main {
   }
 }
 
-.review-edit {
-  margin-top: 0.8rem;
-  padding: 0.8rem;
-  background: #f5f2e8;
-  border-radius: 10px;
+.review-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
 }
 
-.review-edit.hidden {
+.edit-review-btn {
+  border: 1px solid #d7ddcc;
+  background: #fffdf8;
+  color: #2f3f32;
+  border-radius: 999px;
+  padding: 0.42rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.edit-review-btn:hover {
+  background: #f2eee3;
+  transform: translateY(-1px);
+}
+
+.review-modal.hidden {
   display: none;
 }
 
-.review-edit textarea {
+.review-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.review-modal.show {
+  opacity: 1;
+}
+
+.review-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.review-modal-content {
+  position: relative;
+  z-index: 10001;
+  width: min(92vw, 520px);
+  margin: 10vh auto 0;
+  background: #fffdf8;
+  border-radius: 18px;
+  padding: 1.4rem;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.25);
+  transform: scale(0.95);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.review-modal.show .review-modal-content {
+  transform: scale(1);
+}
+
+.review-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #4d5a4d;
+}
+
+.review-modal-title {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.review-modal-text {
   width: 100%;
-  min-height: 60px;
-  margin-bottom: 0.5rem;
+  min-height: 130px;
+  border: 1px solid #d8ddcf;
+  border-radius: 12px;
+  padding: 0.9rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 0.9rem;
+  background: white;
 }
 
-.review-edit select {
-  margin-bottom: 0.5rem;
+.review-modal-rating {
+  width: 100%;
+  border: 1px solid #d8ddcf;
+  border-radius: 12px;
+  padding: 0.8rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  background: white;
 }
 
-.edit-actions {
+.review-modal-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.8rem;
 }
 
-.save-review-btn {
-  background: #86a37c;
-  color: white;
+.review-modal-save,
+.review-modal-delete {
+  flex: 1;
   border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.delete-review-btn {
-  background: #c46b5e;
+.review-modal-save:hover,
+.review-modal-delete:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.review-modal-save {
+  background: #89a07d;
   color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  cursor: pointer;
+}
+
+.review-modal-delete {
+  background: #cf7d67;
+  color: white;
 }

@@ -52,6 +52,33 @@
     <span id="lightbox-close" class="lightbox-close">&times;</span>
   </div>
 
+  <div id="review-modal" class="review-modal hidden">
+    <div class="review-modal-overlay"></div>
+
+    <div class="review-modal-content">
+      <button id="review-modal-close" class="review-modal-close" aria-label="Close">
+        &times;
+      </button>
+
+      <h3 class="review-modal-title">Edit review</h3>
+
+      <textarea id="review-modal-text" class="review-modal-text"></textarea>
+
+      <select id="review-modal-rating" class="review-modal-rating">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+
+      <div class="review-modal-actions">
+        <button id="review-modal-save" class="review-modal-save">Save</button>
+        <button id="review-modal-delete" class="review-modal-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <script src="scripts/api.js"></script>
   <script src="scripts/places-images.js"></script>
   <script src="scripts/place.js"></script>

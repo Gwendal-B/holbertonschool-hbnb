@@ -225,7 +225,7 @@ function displayPlaceDetails(place, currentUser = null) {
         const author = r.user_name || r.user?.first_name || 'Anonymous';
 
         const canManageReview = currentUser &&
-        (currentUser.is_admin || currentUser.id === r.user_id);
+          (currentUser.is_admin || currentUser.id === r.user_id);
 
         return `
           <div class="review-card">
@@ -238,26 +238,13 @@ function displayPlaceDetails(place, currentUser = null) {
 
             ${canManageReview ? `
               <div class="review-actions">
-                <button class="edit-review-btn" data-review-id="${r.id}">
+                <button
+                  class="edit-review-btn"
+                  data-review-id="${r.id}"
+                  data-review-text="${escHtml(r.text || r.comment || '')}"
+                  data-review-rating="${safeRating}">
                   Edit
                 </button>
-
-                <div class="review-edit hidden" id="edit-${r.id}">
-                  <textarea class="edit-text">${escHtml(r.text)}</textarea>
-
-                  <select class="edit-rating">
-                    ${[1,2,3,4,5].map(n => `
-                      <option value="${n}" ${n === r.rating ? 'selected' : ''}>
-                        ${n}
-                      </option>
-                    `).join('')}
-                  </select>
-
-                  <div class="edit-actions">
-                    <button class="save-review-btn" data-review-id="${r.id}">Save</button>
-                    <button class="delete-review-btn" data-review-id="${r.id}">Delete</button>
-                  </div>
-                </div>
               </div>
             ` : ''}
           </div>
@@ -435,60 +422,117 @@ function initReviewActions(currentUser) {
   const token = getCookie('token');
   if (!token) return;
 
-  // Toggle edit
+  const modal = document.getElementById('review-modal');
+  const modalClose = document.getElementById('review-modal-close');
+  const modalText = document.getElementById('review-modal-text');
+  const modalRating = document.getElementById('review-modal-rating');
+  const modalSave = document.getElementById('review-modal-save');
+  const modalDelete = document.getElementById('review-modal-delete');
+
+  if (!modal || !modalText || !modalRating || !modalSave || !modalDelete) return;
+
+  let currentReviewId = null;
+
+  function openModal(reviewId, text, rating) {
+    currentReviewId = reviewId;
+    modalText.value = text || '';
+    modalRating.value = String(rating || 5);
+    modal.classList.remove('hidden');
+
+    // ⚡ déclenche animation
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  }
+
+  function closeModal() {
+    modal.classList.remove('show');
+
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      currentReviewId = null;
+      modalText.value = '';
+      modalRating.value = '5';
+    }, 200);
+  }
+
   document.querySelectorAll('.edit-review-btn').forEach(btn => {
     btn.onclick = () => {
-      const id = btn.dataset.reviewId;
-      const editBox = document.getElementById(`edit-${id}`);
-      editBox.classList.toggle('hidden');
+      const reviewId = btn.dataset.reviewId;
+      const reviewText = btn.dataset.reviewText || '';
+      const reviewRating = parseInt(btn.dataset.reviewRating || '5', 10);
+
+      openModal(reviewId, reviewText, reviewRating);
     };
   });
 
-  // Save review
-  document.querySelectorAll('.save-review-btn').forEach(btn => {
-    btn.onclick = async () => {
-      const id = btn.dataset.reviewId;
-      const container = document.getElementById(`edit-${id}`);
+  modalSave.onclick = async () => {
+    if (!currentReviewId) return;
 
-      const text = container.querySelector('.edit-text').value.trim();
-      const rating = parseInt(container.querySelector('.edit-rating').value, 10);
+    const text = modalText.value.trim();
+    const rating = parseInt(modalRating.value, 10);
 
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ text, rating })
-      });
+    const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${currentReviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ text, rating })
+    });
 
-      if (response.ok) {
-        location.reload();
-      } else {
-        alert('Failed to update review');
+    if (response.ok) {
+      closeModal();
+      location.reload();
+    } else {
+      let message = 'Failed to update review';
+      try {
+        const err = await response.json();
+        message = err.message || err.error || err.msg || message;
+      } catch (_) {}
+      alert(message);
+    }
+  };
+
+  modalDelete.onclick = async () => {
+    if (!currentReviewId) return;
+
+    if (!confirm('Delete this review?')) return;
+
+    const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${currentReviewId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-    };
-  });
+    });
 
-  // Delete review
-  document.querySelectorAll('.delete-review-btn').forEach(btn => {
-    btn.onclick = async () => {
-      const id = btn.dataset.reviewId;
+    if (response.ok) {
+      closeModal();
+      location.reload();
+    } else {
+      let message = 'Failed to delete review';
+      try {
+        const err = await response.json();
+        message = err.message || err.error || err.msg || message;
+      } catch (_) {}
+      alert(message);
+    }
+  };
 
-      if (!confirm('Delete this review?')) return;
+  modalClose.onclick = closeModal;
 
-      const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+  modal.onclick = (e) => {
+    if (
+      e.target.classList.contains('review-modal') ||
+      e.target.classList.contains('review-modal-overlay')
+    ) {
+      closeModal();
+    }
+  };
 
-      if (response.ok) {
-        location.reload();
-      } else {
-        alert('Failed to delete review');
-      }
-    };
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('hidden') && e.key === 'Escape') {
+      closeModal();
+    }
   });
 }
