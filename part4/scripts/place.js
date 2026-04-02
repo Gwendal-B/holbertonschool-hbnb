@@ -280,14 +280,51 @@ function initLightbox() {
   const lightbox = document.getElementById('lightbox');
   const lightboxImage = document.getElementById('lightbox-image');
   const lightboxClose = document.getElementById('lightbox-close');
-  const galleryImages = document.querySelectorAll('.gallery-img');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const galleryImages = Array.from(document.querySelectorAll('.gallery-img'));
 
-  galleryImages.forEach((img) => {
+  if (!lightbox || !lightboxImage || galleryImages.length === 0) return;
+
+  let currentIndex = 0;
+
+  function showImage(index) {
+    if (galleryImages.length === 0) return;
+
+    if (index < 0) {
+      currentIndex = galleryImages.length - 1;
+    } else if (index >= galleryImages.length) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+
+    const selectedImage = galleryImages[currentIndex];
+    lightboxImage.src = selectedImage.dataset.full || selectedImage.src;
+    lightboxImage.alt = selectedImage.alt || 'Expanded photo';
+  }
+
+  galleryImages.forEach((img, index) => {
     img.addEventListener('click', () => {
-      lightboxImage.src = img.dataset.full || img.src;
+      currentIndex = index;
+      showImage(currentIndex);
       lightbox.classList.remove('hidden');
     });
   });
+
+  if (lightboxPrev) {
+    lightboxPrev.onclick = (e) => {
+      e.stopPropagation();
+      showImage(currentIndex - 1);
+    };
+  }
+
+  if (lightboxNext) {
+    lightboxNext.onclick = (e) => {
+      e.stopPropagation();
+      showImage(currentIndex + 1);
+    };
+  }
 
   if (lightboxClose) {
     lightboxClose.onclick = () => {
@@ -296,19 +333,27 @@ function initLightbox() {
     };
   }
 
-  if (lightbox) {
-    lightbox.onclick = (e) => {
-      if (e.target === lightbox) {
-        lightbox.classList.add('hidden');
-        lightboxImage.src = '';
-      }
-    };
-  }
+  lightbox.onclick = (e) => {
+    if (e.target === lightbox) {
+      lightbox.classList.add('hidden');
+      lightboxImage.src = '';
+    }
+  };
 
   document.onkeydown = (e) => {
+    if (lightbox.classList.contains('hidden')) return;
+
     if (e.key === 'Escape') {
       lightbox.classList.add('hidden');
       lightboxImage.src = '';
+    }
+
+    if (e.key === 'ArrowLeft') {
+      showImage(currentIndex - 1);
+    }
+
+    if (e.key === 'ArrowRight') {
+      showImage(currentIndex + 1);
     }
   };
 }

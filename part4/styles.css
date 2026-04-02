@@ -466,38 +466,47 @@ main {
   color: var(--warm-white);
 }
 
+.place-details-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
 .place-details-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2.4rem;
-  font-weight: 400;
-  line-height: 1.15;
-  margin-bottom: 0.5rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem;
+  line-height: 1.1;
+  margin: 0;
 }
 
 .place-price-tag {
   display: inline-block;
-  background: var(--terra);
-  color: var(--warm-white);
-  font-weight: 600;
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 1rem;
+  background: #c87446;
+  color: #fff;
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  line-height: 1;
+  margin-bottom: 0.4rem;
 }
 
 .place-info {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 1rem;
-  margin-bottom: 1.8rem;
+  margin-top: 0.8rem;
+  margin-bottom: 1.7rem;
 }
 
 .place-info-item {
-  background: var(--sand);
-  border-radius: 10px;
-  padding: 1rem 1.2rem;
-  border-left: 3px solid var(--sage);
+  background: #e8e0cf;
+  border-left: 3px solid #86a37c;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
 }
-
 .place-info-label {
   font-size: 0.72rem;
   color: var(--text-light);
@@ -944,7 +953,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 2rem 5rem;
   z-index: 9999;
 }
 
@@ -953,20 +962,70 @@ main {
 }
 
 .lightbox-image {
-  max-width: 90vw;
+  max-width: 88vw;
   max-height: 88vh;
-  border-radius: 14px;
+  border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
 }
 
 .lightbox-close {
   position: absolute;
   top: 18px;
-  right: 28px;
-  font-size: 2.5rem;
+  right: 26px;
+  font-size: 2.6rem;
   color: white;
   cursor: pointer;
   line-height: 1;
+  z-index: 10001;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease, transform 0.2s ease;
+  z-index: 10001;
+}
+
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.lightbox-prev {
+  left: 24px;
+}
+
+.lightbox-next {
+  right: 24px;
+}
+
+@media (max-width: 768px) {
+  .lightbox {
+    padding: 1rem 3.5rem;
+  }
+
+  .lightbox-nav {
+    width: 42px;
+    height: 42px;
+    font-size: 1.5rem;
+  }
+
+  .lightbox-prev {
+    left: 10px;
+  }
+
+  .lightbox-next {
+    right: 10px;
+  }
 }
 
 @media (max-width: 900px) {
