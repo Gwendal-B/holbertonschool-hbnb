@@ -4,10 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HBnB — Place Details</title>
-  <link rel="icon" href="images/icon.png" type="image/png" />
+  <link rel="icon" href="images/favicon.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
+  <div class="bg-slideshow">
+    <div class="bg-slide active" style="background-image: url('images/backgrounds/bg1.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('images/backgrounds/bg2.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('images/backgrounds/bg3.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('images/backgrounds/bg4.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('images/backgrounds/bg5.jpg');"></div>
+    <div class="bg-slide" style="background-image: url('images/backgrounds/bg6.jpg');"></div>
+  </div>
+  <div class="bg-overlay"></div>
 
   <header>
     <a href="index.html" class="logo-wrap" aria-label="HBnB Home">
@@ -78,6 +88,27 @@
       </div>
     </div>
   </div>
+
+  <script>
+    (function () {
+      const slides = document.querySelectorAll('.bg-slide');
+      if (!slides.length) return;
+
+      let current = 0;
+      const intervalTime = 8000; // changer ici la vitesse
+
+      function showSlide(nextIndex) {
+        slides[current].classList.remove('active');
+        current = nextIndex;
+        slides[current].classList.add('active');
+      }
+
+      setInterval(() => {
+        const next = (current + 1) % slides.length;
+        showSlide(next);
+      }, intervalTime);
+    })();
+  </script>
 
   <script src="scripts/api.js"></script>
   <script src="scripts/places-images.js"></script>
