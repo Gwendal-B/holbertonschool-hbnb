@@ -30,17 +30,7 @@ async function fetchCurrentUser() {
   if (!token) return null;
 
   try {
-    const response = await fetch('http://127.0.0.1:5000/api/v1/auth/me', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) return null;
-
-    return await response.json();
+    return await window.HBnB.api.getCurrentUser();
   } catch (_) {
     return null;
   }
@@ -150,27 +140,10 @@ function checkAuthentication() {
 async function fetchPlaceDetails(token, placeId) {
   // Charge en parallèle la place et l'utilisateur courant.
   try {
-    const headers = {
-      'Content-Type': 'application/json'
-    };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const [placeResponse, currentUser] = await Promise.all([
-      fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
-        method: 'GET',
-        headers
-      }),
+    const [place, currentUser] = await Promise.all([
+      window.HBnB.api.getPlace(placeId),
       fetchCurrentUser()
     ]);
-
-    if (!placeResponse.ok) {
-      throw new Error(`HTTP ${placeResponse.status}`);
-    }
-
-    const place = await placeResponse.json();
     displayPlaceDetails(place, currentUser);
   } catch (err) {
     document.getElementById('place-details').innerHTML = `
@@ -565,19 +538,11 @@ function initPlaceActions(currentUser) {
       max_guests: parseInt(modalGuests.value, 10)
     };
 
-    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (response.ok) {
+    try {
+      await window.HBnB.api.updatePlace(placeId, body);
       closeModal();
       location.reload();
-    } else {
+    } catch (_) {
       alert('Failed to update place');
     }
   };
@@ -588,16 +553,10 @@ function initPlaceActions(currentUser) {
 
     if (!confirm('Delete this place?')) return;
 
-    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (response.ok) {
+    try {
+      await window.HBnB.api.deletePlace(placeId);
       window.location.href = 'index.html';
-    } else {
+    } catch (_) {
       alert('Failed to delete place');
     }
   };
@@ -662,25 +621,15 @@ function initReviewActions(place, currentUser) {
     const text = modalText.value.trim();
     const rating = parseInt(modalRating.value, 10);
 
-    const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${currentReviewId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ text, rating })
-    });
-
-    if (response.ok) {
+    try {
+      await window.HBnB.api.updateReview(currentReviewId, { text, rating });
       closeModal();
       location.reload();
-    } else {
-      // Tente d'afficher le message métier renvoyé par l'API.
+    } catch (err) {
       let message = 'Failed to update review';
-      try {
-        const err = await response.json();
-        message = err.message || err.error || err.msg || message;
-      } catch (_) {}
+      if (err instanceof Error && err.message) {
+        message = err.message;
+      }
       alert(message);
     }
   };
@@ -691,23 +640,15 @@ function initReviewActions(place, currentUser) {
 
     if (!confirm('Delete this review?')) return;
 
-    const response = await fetch(`http://127.0.0.1:5000/api/v1/reviews/${currentReviewId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (response.ok) {
+    try {
+      await window.HBnB.api.deleteReview(currentReviewId);
       closeModal();
       location.reload();
-    } else {
-      // Même logique que pour l'édition : on remonte le message backend si disponible.
+    } catch (err) {
       let message = 'Failed to delete review';
-      try {
-        const err = await response.json();
-        message = err.message || err.error || err.msg || message;
-      } catch (_) {}
+      if (err instanceof Error && err.message) {
+        message = err.message;
+      }
       alert(message);
     }
   };

@@ -60,26 +60,9 @@ function checkAuthentication() {
 }
 
 async function fetchPlaces(token) {
-  // Récupère toutes les places. Si un token existe, il est envoyé au backend.
+  // Récupère toutes les places.
   try {
-    const headers = {
-      'Content-Type': 'application/json'
-    };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch('http://127.0.0.1:5000/api/v1/places', {
-      method: 'GET',
-      headers
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const places = await response.json();
+    const places = await window.HBnB.api.getPlaces();
     displayPlaces(places);
   } catch (err) {
     const listEl = document.getElementById('places-list');
@@ -88,7 +71,7 @@ async function fetchPlaces(token) {
         <div class="empty-state">
           <p>⚠ Could not load places: ${escHtml(err.message)}</p>
           <p style="font-size:0.82rem;margin-top:0.5rem;">
-            Make sure the API is running on <code>http://127.0.0.1:5000</code>
+            Make sure the API is running on <code>${escHtml(window.HBnB.API_BASE)}</code>
           </p>
         </div>
       `;

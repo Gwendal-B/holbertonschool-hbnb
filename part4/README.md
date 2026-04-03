@@ -10,6 +10,7 @@ This part includes:
 - Place listing on the home page
 - Place details page with amenities and reviews
 - Review creation for authenticated users
+- Place update/delete actions for the owner or an admin
 - Review update/delete actions for the author or an admin
 - Local image galleries for places with lightbox navigation
 - Responsive styling and animated backgrounds
@@ -37,10 +38,10 @@ part4/
 │   ├── 09-forms.css
 │   └── 10-responsive.css
 ├── scripts/
-│   ├── api.js                   # Shared API helpers + cookie/JWT helpers
+│   ├── api.js                   # Shared API helpers, API base URL, and cookie/JWT helpers
 │   ├── login.js                 # Login form logic
 │   ├── index.js                 # Fetch and render places on home page
-│   ├── place.js                 # Place details, reviews, gallery, edit/delete
+│   ├── place.js                 # Place details, gallery, review actions, place edit/delete
 │   ├── add_review.js            # Review creation flow
 │   └── places-images.js         # Local image mapping per place
 └── images/                      # Logo, icons, backgrounds, place photos
@@ -75,8 +76,16 @@ The place page:
 - Shows a gallery using local images from `scripts/places-images.js`
 - Opens images in a lightbox with previous/next navigation
 - Lists existing reviews
+- Calls `GET /api/v1/auth/me` when a JWT is present to determine which actions are allowed
 
-### 4. Review Management
+### 4. Place Management
+
+Place owners and admins can also:
+
+- Edit a place with `PUT /api/v1/places/<place_id>`
+- Delete a place with `DELETE /api/v1/places/<place_id>`
+
+### 5. Review Management
 
 Authenticated users can:
 
@@ -87,8 +96,6 @@ Review owners and admins can also:
 
 - Edit a review with `PUT /api/v1/reviews/<review_id>`
 - Delete a review with `DELETE /api/v1/reviews/<review_id>`
-
-The page also calls `GET /api/v1/auth/me` to determine whether the current user can manage a review.
 
 ---
 
@@ -106,13 +113,11 @@ Configured in:
 const API_BASE = 'http://127.0.0.1:5000/api/v1';
 ```
 
-If your backend runs on another host or port, update the fetch URLs in:
+All frontend API calls are centralized in:
 
 - `scripts/api.js`
-- `scripts/login.js`
-- `scripts/index.js`
-- `scripts/place.js`
-- `scripts/add_review.js`
+
+If your backend runs on another host or port, updating `API_BASE` in `scripts/api.js` is enough.
 
 ---
 
@@ -124,6 +129,8 @@ If your backend runs on another host or port, update the fetch URLs in:
 | GET | `/api/v1/auth/me` | Get current authenticated user |
 | GET | `/api/v1/places` | List all places |
 | GET | `/api/v1/places/<id>` | Get one place with details |
+| PUT | `/api/v1/places/<id>` | Update a place |
+| DELETE | `/api/v1/places/<id>` | Delete a place |
 | POST | `/api/v1/reviews` | Create a review |
 | PUT | `/api/v1/reviews/<id>` | Update a review |
 | DELETE | `/api/v1/reviews/<id>` | Delete a review |
@@ -174,9 +181,11 @@ Using a local HTTP server is recommended so pages, scripts, and assets behave co
 ## Notes
 
 - JWT authentication is handled with browser cookies
+- API requests are centralized through `scripts/api.js`
 - Place images are mapped locally based on place names
 - A default image is used if no matching image is found
 - Some UI labels such as location and guest count include frontend fallbacks when backend data is incomplete
+- `add_review.html` accepts either `?id=<place_id>` or `?place_id=<place_id>` in the URL
 
 ---
 

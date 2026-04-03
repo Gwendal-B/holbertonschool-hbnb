@@ -139,6 +139,14 @@ const api = {
   },
 
   /**
+   * GET /auth/me
+   * @returns {Promise<Object>}
+   */
+  getCurrentUser() {
+    return apiFetch('/auth/me');
+  },
+
+  /**
    * GET /places
    * @returns {Promise<Array>}
    */
@@ -156,15 +164,66 @@ const api = {
   },
 
   /**
-   * POST /places/:id/reviews
+   * PUT /places/:id
+   * @param {string} id
+   * @param {Object} data
+   * @returns {Promise<Object>}
+   */
+  updatePlace(id, data) {
+    return apiFetch(`/places/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * DELETE /places/:id
+   * @param {string} id
+   * @returns {Promise<null>}
+   */
+  deletePlace(id) {
+    return apiFetch(`/places/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
+   * POST /reviews
    * @param {string} placeId
    * @param {{text: string, rating: number}} data
    * @returns {Promise<Object>}
    */
-  addReview(placeId, data) {
-    return apiFetch(`/places/${placeId}/reviews`, {
+  createReview(placeId, data) {
+    return apiFetch('/reviews', {
       method: 'POST',
+      body: JSON.stringify({
+        ...data,
+        place_id: placeId,
+      }),
+    });
+  },
+
+  /**
+   * PUT /reviews/:id
+   * @param {string} id
+   * @param {{text: string, rating: number}} data
+   * @returns {Promise<Object>}
+   */
+  updateReview(id, data) {
+    return apiFetch(`/reviews/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * DELETE /reviews/:id
+   * @param {string} id
+   * @returns {Promise<null>}
+   */
+  deleteReview(id) {
+    return apiFetch(`/reviews/${id}`, {
+      method: 'DELETE',
     });
   },
 };
@@ -174,4 +233,11 @@ const api = {
    ───────────────────────────────────────────────── */
 // Si tu utilises un bundler : export { api, getToken, setToken, removeToken, isAuthenticated };
 // En pur HTML/JS (fichiers servis statiquement), on expose sur window :
-window.HBnB = { api, getToken, setToken, removeToken, isAuthenticated };
+window.HBnB = {
+  API_BASE,
+  api,
+  getToken,
+  setToken,
+  removeToken,
+  isAuthenticated
+};

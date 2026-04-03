@@ -10,42 +10,11 @@
 
 'use strict';
 
-/* ─── Helper : stocke le JWT dans un cookie ─── */
-function setCookie(name, value) {
-  document.cookie = `${name}=${value}; path=/`;
-}
-
 /* ─── Fonction principale de login ─── */
 async function loginUser(email, password) {
-  const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ email, password })
-  });
-
-  if (response.ok) {
-    const data = await response.json();
-    setCookie('token', data.access_token);
-    window.location.href = 'index.html';
-  } else {
-    /* Essaie de lire un message JSON, sinon affiche le statusText */
-    let message = response.statusText;
-    try {
-      const err = await response.json();
-      message = err.message || err.error || message;
-    } catch (_) { /* pas de corps JSON */ }
-
-    const msgEl = document.getElementById('form-message');
-    if (msgEl) {
-      msgEl.textContent   = `Login failed: ${message}`;
-      msgEl.className     = 'form-message error';
-      msgEl.style.display = 'block';
-    } else {
-      alert('Login failed: ' + message);
-    }
-  }
+  const data = await window.HBnB.api.login(email, password);
+  window.HBnB.setToken(data.access_token);
+  window.location.href = 'index.html';
 }
 
 /* ─── Event listener sur DOMContentLoaded ─── */
@@ -76,6 +45,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         await loginUser(email, password);
+      } catch (err) {
+        const msgEl = document.getElementById('form-message');
+        const message = err instanceof Error ? err.message : 'Login failed';
+
+        if (msgEl) {
+          msgEl.textContent = `Login failed: ${message}`;
+          msgEl.className = 'form-message error';
+          msgEl.style.display = 'block';
+        } else {
+          alert('Login failed: ' + message);
+        }
       } finally {
         /* Ré-active si on reste sur la page (échec) */
         if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }

@@ -30,35 +30,19 @@ function getPlaceIdFromURL() {
 
 async function submitReview(token, placeId, reviewText) {
   // Envoie la review au backend avec le texte, la note et l'ID de la place.
-  const response = await fetch('http://127.0.0.1:5000/api/v1/reviews', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
+  try {
+    await window.HBnB.api.createReview(placeId, {
       text: reviewText,
-      rating: parseInt(document.getElementById('rating').value, 10),
-      place_id: placeId
-    })
-  });
+      rating: parseInt(document.getElementById('rating').value, 10)
+    });
 
-  await handleResponse(response, placeId);
-}
-
-async function handleResponse(response, placeId) {
-  // Si tout se passe bien, on revient à la page détail de la place.
-  if (response.ok) {
     alert('Review submitted successfully!');
     document.getElementById('review-form').reset();
     window.location.href = `place.html?id=${encodeURIComponent(placeId)}`;
-  } else {
+  } catch (err) {
     let message = 'Failed to submit review';
-    try {
-      const err = await response.json();
-      message = err.message || err.error || err.msg || JSON.stringify(err);
-    } catch (_) {
-      // ignore
+    if (err instanceof Error && err.message) {
+      message = err.message;
     }
     alert(message);
   }
