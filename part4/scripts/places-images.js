@@ -1,6 +1,13 @@
+/**
+ * places-images.js
+ * Associe des images locales aux places affichées dans l'interface.
+ * Le mapping repose surtout sur le nom de la place
+ * avec une image par défaut si aucun cas ne correspond.
+ */
 'use strict';
 
 function getPhotosForPlace(place) {
+  // Retourne un tableau de photos pour la galerie de la place.
   const name = (place.title || place.name || '').toLowerCase();
   const id = String(place.id || '');
 
@@ -88,5 +95,6 @@ function getPhotosForPlace(place) {
 }
 
 function getPhotoForPlace(place) {
+  // Utilisé sur la home pour n'afficher que l'image principale.
   return getPhotosForPlace(place)[0];
 }

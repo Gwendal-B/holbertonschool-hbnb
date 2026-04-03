@@ -1,3 +1,9 @@
+/*
+  06-reviews.css
+  Styles liés aux reviews :
+  grille d'affichage, cartes de commentaires
+  et bouton permettant d'ouvrir l'édition d'une review.
+*/
 /* ── Reviews ── */
 .reviews-grid {
   display: grid;

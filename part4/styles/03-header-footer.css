@@ -1,3 +1,9 @@
+/*
+  03-header-footer.css
+  Définit la structure et le style communs du header et du footer :
+  logo, navigation, bouton de connexion
+  et barre supérieure fixe.
+*/
 /* ── Header ── */
 header {
   background: rgba(28, 43, 30, 0.96);

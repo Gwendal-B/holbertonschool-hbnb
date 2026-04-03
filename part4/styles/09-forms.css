@@ -1,3 +1,9 @@
+/*
+  09-forms.css
+  Styles des formulaires du projet :
+  cartes de formulaire, champs, messages d'erreur/succès
+  et bouton principal.
+*/
 /* ── Forms ── */
 .form-container {
   max-width: 480px;

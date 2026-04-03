@@ -1,3 +1,10 @@
+/**
+ * place.js
+ * Script de la page détail d'une place.
+ * Il récupère l'ID dans l'URL, charge les informations du logement,
+ * affiche la galerie, gère l'authentification et permet
+ * l'édition/suppression des reviews autorisées.
+ */
 'use strict';
 
 function getPlaceIdFromURL() {
@@ -10,8 +17,14 @@ function getCookie(name) {
   const found = cookies.find(row => row.startsWith(name + '='));
   return found ? decodeURIComponent(found.split('=')[1]) : null;
 }
-/* Option Delete Review*/
+
+/*
+  Récupère l'utilisateur authentifié via /auth/me.
+  Cette information sert ensuite à afficher les actions "Edit/Delete"
+  uniquement sur les reviews que l'utilisateur a le droit de gérer.
+*/
 async function fetchCurrentUser() {
+  // Sert à savoir si l'utilisateur courant peut modifier une review.
   const token = getCookie('token');
 
   if (!token) return null;
@@ -34,6 +47,7 @@ async function fetchCurrentUser() {
 }
 
 function getLocationLabel(place) {
+  // Même logique que sur la home : données API si disponibles, sinon fallback lisible.
   const city = place.city || '';
   const country = place.country || '';
 
@@ -54,6 +68,7 @@ function getLocationLabel(place) {
 }
 
 function getGuestsLabel(place) {
+  // Fournit un fallback si le backend ne renvoie pas explicitement le nombre de guests.
   if (place.max_guests) return place.max_guests;
   if (place.number_of_guests) return place.number_of_guests;
   if (place.guests) return place.guests;
@@ -70,6 +85,7 @@ function getGuestsLabel(place) {
 }
 
 function getAmenityIcon(name) {
+  // Associe une icône simple à chaque amenity pour améliorer la lecture visuelle.
   const n = name.toLowerCase();
 
   if (n.includes('wifi')) return '📶';
@@ -95,6 +111,7 @@ function getAmenityIcon(name) {
 }
 
 function checkAuthentication() {
+  // Adapte le lien Login/Logout et déclenche ensuite le chargement de la place.
   const token = getCookie('token');
   const addReviewSection = document.getElementById('add-review');
   const loginLink = document.getElementById('login-link');
@@ -125,6 +142,7 @@ function checkAuthentication() {
 }
 
 async function fetchPlaceDetails(token, placeId) {
+  // Charge en parallèle la place et l'utilisateur courant.
   try {
     const headers = {
       'Content-Type': 'application/json'
@@ -159,6 +177,7 @@ async function fetchPlaceDetails(token, placeId) {
 }
 
 function buildGalleryHTML(place, name) {
+  // Prépare la galerie avec une grande image principale et deux miniatures.
   const photos = getPhotosForPlace(place);
   const mainPhoto = photos[0] || 'images/places/default-place.jpg';
   const sidePhotos = photos.slice(1, 3);
@@ -189,6 +208,7 @@ function buildGalleryHTML(place, name) {
 }
 
 function displayPlaceDetails(place, currentUser = null) {
+  // Rend tout le contenu principal de la page détail à partir de la réponse API.
   const detailsEl = document.getElementById('place-details');
   detailsEl.innerHTML = '';
 
@@ -212,6 +232,7 @@ function displayPlaceDetails(place, currentUser = null) {
         </li>
       `).join('')
     : `
+      <!-- Fallback visuel si aucune amenity n'est renvoyée -->
       <li class="amenity-tag">📶 WiFi</li>
       <li class="amenity-tag">🍳 Kitchen</li>
       <li class="amenity-tag">🔥 Heating</li>
@@ -219,11 +240,13 @@ function displayPlaceDetails(place, currentUser = null) {
 
   const reviewsHTML = (place.reviews && place.reviews.length)
     ? place.reviews.map(r => {
+        // On sécurise la note entre 0 et 5 avant d'afficher les étoiles.
         const rating = Number(r.rating ?? 0);
         const safeRating = Math.max(0, Math.min(5, rating));
         const stars = '★'.repeat(safeRating) + '☆'.repeat(5 - safeRating);
         const author = r.user_name || r.user?.first_name || 'Anonymous';
 
+        // Le bouton d'édition n'apparaît que pour l'auteur de la review ou un admin.
         const canManageReview = currentUser &&
           (currentUser.is_admin || currentUser.id === r.user_id);
 
@@ -304,12 +327,14 @@ function displayPlaceDetails(place, currentUser = null) {
   `;
 
   detailsEl.appendChild(section);
+  // Une fois le HTML injecté, on active les comportements liés au DOM créé dynamiquement.
   applyImageFallbacks();
   initLightbox();
   initReviewActions(currentUser);
 }
 
 function applyImageFallbacks() {
+  // Remplace chaque image cassée par l'image par défaut.
   const images = document.querySelectorAll('.gallery-img');
 
   images.forEach((img) => {
@@ -322,6 +347,7 @@ function applyImageFallbacks() {
 }
 
 function initLightbox() {
+  // Ouvre les images en grand et permet la navigation clavier/boutons.
   const lightbox = document.getElementById('lightbox');
   const lightboxImage = document.getElementById('lightbox-image');
   const lightboxClose = document.getElementById('lightbox-close');
@@ -334,6 +360,7 @@ function initLightbox() {
   let currentIndex = 0;
 
   function showImage(index) {
+    // Boucle sur les images pour naviguer sans sortir des bornes.
     if (galleryImages.length === 0) return;
 
     if (index < 0) {
@@ -351,6 +378,7 @@ function initLightbox() {
 
   galleryImages.forEach((img, index) => {
     img.addEventListener('click', () => {
+      // Ouvre la lightbox sur l'image cliquée.
       currentIndex = index;
       showImage(currentIndex);
       lightbox.classList.remove('hidden');
@@ -386,6 +414,7 @@ function initLightbox() {
   };
 
   document.onkeydown = (e) => {
+    // Navigation clavier uniquement quand la lightbox est visible.
     if (lightbox.classList.contains('hidden')) return;
 
     if (e.key === 'Escape') {
@@ -422,6 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initReviewActions(currentUser) {
+  // Active la modale d'édition uniquement pour les reviews autorisées.
   const token = getCookie('token');
   if (!token) return;
 
@@ -437,6 +467,7 @@ function initReviewActions(currentUser) {
   let currentReviewId = null;
 
   function openModal(reviewId, text, rating) {
+    // Pré-remplit la modale avec le contenu actuel de la review.
     currentReviewId = reviewId;
     modalText.value = text || '';
     modalRating.value = String(rating || 5);
@@ -449,6 +480,7 @@ function initReviewActions(currentUser) {
   }
 
   function closeModal() {
+    // Ferme la modale et réinitialise son état local.
     modal.classList.remove('show');
 
     setTimeout(() => {
@@ -461,6 +493,7 @@ function initReviewActions(currentUser) {
 
   document.querySelectorAll('.edit-review-btn').forEach(btn => {
     btn.onclick = () => {
+      // Chaque bouton récupère les données stockées en data-* sur la review.
       const reviewId = btn.dataset.reviewId;
       const reviewText = btn.dataset.reviewText || '';
       const reviewRating = parseInt(btn.dataset.reviewRating || '5', 10);
@@ -470,6 +503,7 @@ function initReviewActions(currentUser) {
   });
 
   modalSave.onclick = async () => {
+    // Met à jour la review sélectionnée via l'endpoint PUT /reviews/:id.
     if (!currentReviewId) return;
 
     const text = modalText.value.trim();
@@ -488,6 +522,7 @@ function initReviewActions(currentUser) {
       closeModal();
       location.reload();
     } else {
+      // Tente d'afficher le message métier renvoyé par l'API.
       let message = 'Failed to update review';
       try {
         const err = await response.json();
@@ -498,6 +533,7 @@ function initReviewActions(currentUser) {
   };
 
   modalDelete.onclick = async () => {
+    // Supprime la review après confirmation utilisateur.
     if (!currentReviewId) return;
 
     if (!confirm('Delete this review?')) return;
@@ -513,6 +549,7 @@ function initReviewActions(currentUser) {
       closeModal();
       location.reload();
     } else {
+      // Même logique que pour l'édition : on remonte le message backend si disponible.
       let message = 'Failed to delete review';
       try {
         const err = await response.json();

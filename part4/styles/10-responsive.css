@@ -1,3 +1,9 @@
+/*
+  10-responsive.css
+  Ajustements responsive pour mobile et tablette :
+  header, hero, formulaires, galerie photo
+  et lightbox.
+*/
 /* ── Responsive ── */
 @media (max-width: 768px) {
   header { padding: 0 1.2rem; }

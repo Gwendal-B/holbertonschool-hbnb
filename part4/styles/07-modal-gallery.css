@@ -1,3 +1,9 @@
+/*
+  07-modal-gallery.css
+  Styles de la galerie photo et de la lightbox :
+  affichage des images sur la page place
+  et interactions visuelles pour l'agrandissement.
+*/
 /* ── Photo Gallery (place detail page) ── */
 .gallery {
   position: relative;

@@ -1,3 +1,9 @@
+/*
+  04-home.css
+  Styles spécifiques à la page d'accueil :
+  hero section, grille des places
+  et cartes de logements affichées dynamiquement.
+*/
 /* ── Hero Section (index only) ── */
 .hero {
   position: relative;

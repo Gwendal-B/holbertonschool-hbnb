@@ -1,3 +1,9 @@
+/**
+ * index.js
+ * Script principal de la page d'accueil.
+ * Il gère l'état de connexion, récupère les places depuis l'API,
+ * les affiche sous forme de cartes et applique le filtre par prix.
+ */
 'use strict';
 
 function getCookie(name) {
@@ -7,6 +13,7 @@ function getCookie(name) {
 }
 
 function getLocationLabel(place) {
+  // Utilise d'abord les données API, puis un fallback basé sur le nom.
   const city = place.city || '';
   const country = place.country || '';
 
@@ -27,6 +34,7 @@ function getLocationLabel(place) {
 }
 
 function checkAuthentication() {
+  // Met à jour le lien de navigation selon la présence du token JWT.
   const token = getCookie('token');
   const loginLink = document.getElementById('login-link');
 
@@ -52,6 +60,7 @@ function checkAuthentication() {
 }
 
 async function fetchPlaces(token) {
+  // Récupère toutes les places. Si un token existe, il est envoyé au backend.
   try {
     const headers = {
       'Content-Type': 'application/json'
@@ -88,6 +97,7 @@ async function fetchPlaces(token) {
 }
 
 function displayPlaces(places) {
+  // Construit dynamiquement les cartes affichées sur la home.
   const listEl = document.getElementById('places-list');
   if (!listEl) return;
 
@@ -99,6 +109,7 @@ function displayPlaces(places) {
   }
 
   places.forEach((place) => {
+    // On normalise quelques champs car l'API peut exposer des noms légèrement différents.
     const price = place.price_by_night ?? place.price ?? 0;
     const name = place.title || place.name || 'Unknown place';
     const imageUrl = getPhotoForPlace(place);
@@ -125,6 +136,7 @@ function displayPlaces(places) {
 }
 
 function applyCardImageFallbacks() {
+  // Sécurise l'affichage si une image locale est manquante.
   const images = document.querySelectorAll('.place-card-img');
 
   images.forEach((img) => {
@@ -136,6 +148,7 @@ function applyCardImageFallbacks() {
 }
 
 function initPriceFilter() {
+  // Cache les cartes dont le prix dépasse la valeur choisie.
   const filter = document.getElementById('price-filter');
   if (!filter) return;
 
@@ -165,6 +178,7 @@ function escHtml(str) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialise le filtre puis charge la session / les places au chargement de la page.
   initPriceFilter();
   checkAuthentication();
 });

@@ -1,3 +1,9 @@
+/*
+  05-place.css
+  Styles de la page détail d'une place :
+  bloc principal, informations du logement,
+  description, amenities et présentation générale.
+*/
 /* ── Place Details ── */
 .place-details {
   background: var(--warm-white);

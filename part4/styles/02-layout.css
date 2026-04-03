@@ -1,3 +1,9 @@
+/*
+  02-layout.css
+  Gère la mise en page globale du contenu principal :
+  conteneur main, en-têtes de section
+  et barre de filtre utilisée sur la page d'accueil.
+*/
 /* ── Main ── */
 main {
   flex: 1;

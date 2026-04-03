@@ -1,3 +1,9 @@
+/*
+  styles.css
+  Fichier principal de styles.
+  Il ne contient pas de règles directes : il assemble tous les fichiers
+  CSS de Part 4 pour garder une structure claire et modulaire.
+*/
 @import url('styles/01-base.css');
 @import url('styles/02-layout.css');
 @import url('styles/03-header-footer.css');
