@@ -1,0 +1,51 @@
+/* =========================
+   Animated background
+========================= */
+
+.bg-slideshow {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+}
+
+.bg-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 1.6s ease-in-out;
+  will-change: transform, opacity;
+}
+
+.bg-slide.active {
+  opacity: 1;
+  animation: kenburns 10s ease-in-out forwards;
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  backdrop-filter: blur(6px);
+  background: rgba(8, 12, 18, 0.58);
+}
+
+header,
+main,
+footer {
+  position: relative;
+  z-index: 1;
+}

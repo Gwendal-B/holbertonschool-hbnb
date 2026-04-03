@@ -1,0 +1,122 @@
+/* ── Forms ── */
+.form-container {
+  max-width: 480px;
+  margin: 3rem auto;
+}
+
+.form-card {
+  background: var(--warm-white);
+  border: 1px solid var(--mist);
+  border-radius: 16px;
+  padding: 2.8rem 2.4rem;
+  box-shadow: var(--shadow-md);
+  animation: fadeUp 0.5s ease both;
+}
+
+.form-card h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--forest);
+  margin-bottom: 0.3rem;
+}
+
+.form-card p.form-sub {
+  color: var(--text-light);
+  font-size: 0.88rem;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.3rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  background: var(--cream);
+  color: var(--text-dark);
+  border: 1.5px solid var(--mist);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--moss);
+  background: var(--warm-white);
+  box-shadow: 0 0 0 3px rgba(74,103,65,0.12);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.6;
+}
+
+.form-error {
+  display: none;
+  color: #c0392b;
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--forest);
+  color: var(--sand);
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 12px rgba(28,43,30,0.25);
+}
+.btn-primary:hover {
+  background: var(--moss);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(28,43,30,0.3);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-message {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  display: none;
+}
+.form-message.success {
+  background: rgba(74,103,65,0.1);
+  border: 1px solid var(--sage);
+  color: var(--forest);
+}
+.form-message.error {
+  background: rgba(192,57,43,0.08);
+  border: 1px solid #e74c3c;
+  color: #c0392b;
+}

@@ -1,0 +1,206 @@
+/* ── Hero Section (index only) ── */
+.hero {
+  position: relative;
+  height: 520px;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: flex-end;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80');
+  background-size: cover;
+  background-position: center 40%;
+  transform: scale(1.03);
+  transition: transform 8s ease;
+}
+.hero:hover .hero-bg { transform: scale(1.08); }
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(28,43,30,0.85) 0%,
+    rgba(28,43,30,0.3) 50%,
+    transparent 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 3rem;
+  animation: fadeUp 0.9s ease both;
+}
+
+.hero-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--terra-light);
+  margin-bottom: 0.6rem;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 300;
+  color: var(--warm-white);
+  line-height: 1.15;
+  margin-bottom: 0.8rem;
+}
+.hero-title em {
+  font-style: italic;
+  color: var(--mist);
+}
+
+.hero-sub {
+  color: var(--mist);
+  font-size: 1rem;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+
+/* ── Places Grid ── */
+#places-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--card-mar);
+}
+
+/* ── Place Card ── */
+.place-card {
+  background: var(--surface);
+  border: var(--card-bdr);
+  border-radius: var(--radius);
+  padding: var(--card-pad);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.place-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered animation delay */
+.place-card:nth-child(1) { animation-delay: 0.05s; }
+.place-card:nth-child(2) { animation-delay: 0.10s; }
+.place-card:nth-child(3) { animation-delay: 0.15s; }
+.place-card:nth-child(4) { animation-delay: 0.20s; }
+.place-card:nth-child(5) { animation-delay: 0.25s; }
+.place-card:nth-child(6) { animation-delay: 0.30s; }
+
+.place-card-img-wrap {
+  position: relative;
+  height: 200px;
+  border-radius: 7px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: var(--mist);
+}
+
+.place-card-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+  display: block;
+  margin-bottom: 12px;
+  background: #e9e6df;
+}
+.place-card:hover .place-card-img { transform: scale(1.07); }
+
+.place-card-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(28,43,30,0.82);
+  color: var(--sand);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+.place-card-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--forest);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.place-card-location {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.location-pin {
+  color: #d94b70;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.place-card-price {
+  color: var(--terra);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+.place-card-price span {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-light);
+}
+
+.details-button {
+  display: inline-block;
+  background: var(--forest);
+  color: var(--sand) !important;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.2s, transform 0.15s;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+}
+.details-button:hover {
+  background: var(--moss);
+  text-decoration: none;
+  transform: translateY(-1px);
+}

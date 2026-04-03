@@ -1,0 +1,82 @@
+/* ── Reviews ── */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--card-mar);
+  margin-bottom: 2rem;
+}
+
+.review-card {
+  background: var(--warm-white);
+  border: var(--card-bdr);
+  border-radius: var(--radius);
+  padding: var(--card-pad);
+  margin: 0;
+  transition: box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.review-card::before {
+  content: '"';
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5rem;
+  color: var(--mist);
+  line-height: 1;
+  pointer-events: none;
+}
+.review-card:hover { box-shadow: var(--shadow-md); }
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-top: 0.5rem;
+}
+
+.review-author {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--forest);
+}
+
+.review-rating {
+  font-size: 0.82rem;
+  color: var(--terra);
+  letter-spacing: 1px;
+}
+
+.review-text {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+
+/* ── Add Delete Button (for Reviews) ── */
+.review-actions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit-review-btn {
+  border: 1px solid #c9cfbf;
+  background: #fffdf7;
+  color: #2c3b2f;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.edit-review-btn:hover {
+  background: #f3efe5;
+  transform: translateY(-1px);
+}

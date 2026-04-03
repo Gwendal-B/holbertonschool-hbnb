@@ -1,0 +1,56 @@
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  header { padding: 0 1.2rem; }
+  main   { padding: 1.5rem 1rem; }
+  .hero  { height: 360px; }
+  .hero-content { padding: 1.5rem; }
+  .place-details-hero { height: 280px; }
+  .place-details-title { font-size: 1.8rem; }
+  .form-card { padding: 1.8rem 1.4rem; }
+  nav a:not(.login-button) { display: none; }
+}
+
+@media (max-width: 768px) {
+  .gallery { aspect-ratio: 4 / 3; border-radius: 10px; }
+  .gallery-btn { width: 36px; height: 36px; font-size: 1.3rem; }
+}
+
+
+@media (max-width: 768px) {
+  .lightbox {
+    padding: 1rem 3.5rem;
+  }
+
+  .lightbox-nav {
+    width: 42px;
+    height: 42px;
+    font-size: 1.5rem;
+  }
+
+  .lightbox-prev {
+    left: 10px;
+  }
+
+  .lightbox-next {
+    right: 10px;
+  }
+}
+
+@media (max-width: 900px) {
+  .place-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .place-gallery-main img {
+    height: 280px;
+  }
+
+  .place-gallery-side {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+  }
+
+  .place-gallery-side img {
+    height: 170px;
+  }
+}
