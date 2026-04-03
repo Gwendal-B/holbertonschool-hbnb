@@ -113,7 +113,6 @@ function getAmenityIcon(name) {
 function checkAuthentication() {
   // Adapte le lien Login/Logout et déclenche ensuite le chargement de la place.
   const token = getCookie('token');
-  const addReviewSection = document.getElementById('add-review');
   const loginLink = document.getElementById('login-link');
 
   if (loginLink) {
@@ -132,10 +131,6 @@ function checkAuthentication() {
         window.location.href = 'index.html';
       };
     }
-  }
-
-  if (addReviewSection) {
-    addReviewSection.style.display = token ? 'block' : 'none';
   }
 
   fetchPlaceDetails(token, placeId);
@@ -220,11 +215,6 @@ function displayPlaceDetails(place, currentUser = null) {
 
   document.title = `HBnB — ${name}`;
 
-  const reviewLink = document.getElementById('add-review-link');
-  if (reviewLink) {
-    reviewLink.href = `add_review.html?id=${encodeURIComponent(place.id)}`;
-  }
-
   const amenitiesHTML = (place.amenities && place.amenities.length)
     ? place.amenities.map(a => `
         <li class="amenity-tag">
@@ -275,6 +265,17 @@ function displayPlaceDetails(place, currentUser = null) {
       }).join('')
     : '<p class="text-muted" style="font-style:italic;">No reviews yet — be the first to share your experience.</p>';
 
+  const token = getCookie('token');
+
+  const addReviewHTML = token ? `
+    <div class="add-review-block">
+      <h2 class="section-title section-title-light">Add a Review</h2>
+      <a href="add_review.html?id=${encodeURIComponent(place.id)}" class="add-review-btn">
+        Write a review
+      </a>
+    </div>
+  ` : '';
+
   const section = document.createElement('div');
   section.innerHTML = `
     <div class="place-details">
@@ -321,8 +322,7 @@ function displayPlaceDetails(place, currentUser = null) {
 
     <h2 class="section-title section-title-light" style="margin-top:2.5rem;">Guest reviews</h2>
     <div class="reviews-grid">${reviewsHTML}</div>
-    <h2 class="section-title section-title-light" style="margin-top:2.5rem;">Add a Review</h2>
-    <a id="add-review-link" href="#" class="add-review-btn">Write a review</a>
+    ${addReviewHTML}
 
   `;
 
