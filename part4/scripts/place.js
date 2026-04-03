@@ -296,8 +296,11 @@ function displayPlaceDetails(place, currentUser = null) {
       </ul>
     </div>
 
-    <h2 class="section-title" style="margin-top:2.5rem;">Guest reviews</h2>
+    <h2 class="section-title section-title-light" style="margin-top:2.5rem;">Guest reviews</h2>
     <div class="reviews-grid">${reviewsHTML}</div>
+    <h2 class="section-title section-title-light" style="margin-top:2.5rem;">Add a Review</h2>
+    <a id="add-review-link" href="#" class="add-review-btn">Write a review</a>
+
   `;
 
   detailsEl.appendChild(section);
