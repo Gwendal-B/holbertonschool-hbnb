@@ -106,6 +106,17 @@ function getAmenityIcon(name) {
   if (n.includes('terrace')) return '🌤️';
   if (n.includes('tv')) return '📺';
   if (n.includes('elevator')) return '🛗';
+  if (n.includes('pet')) return '🐶';
+  if (n.includes('forest')) return '🌲';
+  if (n.includes('feeding')) return '🍖';
+  if (n.includes('wood')) return '🪵';
+  if (n.includes('magical')) return '🧙‍♂️';
+  if (n.includes('environment')) return '🕯️';
+  if (n.includes('lake')) return '🌊';
+  if (n.includes('stone')) return '🪨';
+  if (n.includes('fire')) return '🔥';
+  if (n.includes('fishing')) return '🐟';
+  if (n.includes('phenomena')) return '⚠️';
 
   return '✔️';
 }
@@ -212,6 +223,26 @@ function displayPlaceDetails(place, currentUser = null) {
   const locationLabel = getLocationLabel(place);
   const guestsLabel = getGuestsLabel(place);
   const galleryHTML = buildGalleryHTML(place, name);
+  const canManagePlace = currentUser &&
+    place.owner &&
+    (currentUser.is_admin || currentUser.id === place.owner.id);
+
+  const placeActionsHTML = canManagePlace ? `
+    <div class="place-actions">
+      <button
+        id="edit-place-btn"
+        class="edit-place-btn"
+        data-place-id="${place.id}"
+        data-place-title="${escHtml(name)}"
+        data-place-description="${escHtml(place.description || '')}"
+        data-place-price="${price}"
+        data-place-city="${escHtml(place.city || '')}"
+        data-place-country="${escHtml(place.country || '')}"
+        data-place-guests="${place.max_guests ?? guestsLabel}">
+        Edit place
+      </button>
+    </div>
+  ` : '';
 
   document.title = `HBnB — ${name}`;
 
@@ -284,6 +315,7 @@ function displayPlaceDetails(place, currentUser = null) {
       <div class="place-details-header">
         <h1 class="place-details-title">${escHtml(name)}</h1>
         <span class="place-price-tag">$${price} / night</span>
+        ${placeActionsHTML}
       </div>
 
       <div class="place-info">
@@ -330,6 +362,7 @@ function displayPlaceDetails(place, currentUser = null) {
   // Une fois le HTML injecté, on active les comportements liés au DOM créé dynamiquement.
   applyImageFallbacks();
   initLightbox();
+  initPlaceActions(place, currentUser);
   initReviewActions(currentUser);
 }
 
@@ -450,7 +483,127 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAuthentication();
 });
 
-function initReviewActions(currentUser) {
+function initPlaceActions(currentUser) {
+  const editBtn = document.getElementById('edit-place-btn');
+  const modal = document.getElementById('place-modal');
+  const modalClose = document.getElementById('place-modal-close');
+
+  const modalTitle = document.getElementById('place-modal-title');
+  const modalDescription = document.getElementById('place-modal-description');
+  const modalPrice = document.getElementById('place-modal-price');
+  const modalCity = document.getElementById('place-modal-city');
+  const modalCountry = document.getElementById('place-modal-country');
+  const modalGuests = document.getElementById('place-modal-guests');
+  
+  const modalSave = document.getElementById('place-modal-save');
+  const modalDelete = document.getElementById('place-modal-delete');
+  const token = getCookie('token');
+
+  if (
+    !editBtn ||
+    !modal ||
+    !modalClose ||
+    !modalSave ||
+    !modalDelete ||
+    !modalTitle ||
+    !modalDescription ||
+    !modalPrice ||
+    !modalCity ||
+    !modalCountry ||
+    !modalGuests
+  ) return;
+
+  function openModal() {
+    modalTitle.value = editBtn.dataset.placeTitle || '';
+    modalDescription.value = editBtn.dataset.placeDescription || '';
+    modalPrice.value = editBtn.dataset.placePrice || '';
+    modalCity.value = editBtn.dataset.placeCity || '';
+    modalCountry.value = editBtn.dataset.placeCountry || '';
+    modalGuests.value = editBtn.dataset.placeGuests || '';
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  }
+
+  function closeModal() {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 200);
+  }
+
+  editBtn.onclick = openModal;
+  modalClose.onclick = closeModal;
+
+  modal.onclick = (e) => {
+    if (
+      e.target.classList.contains('place-modal') ||
+      e.target.classList.contains('place-modal-overlay')
+    ) {
+      closeModal();
+    }
+  };
+
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('hidden') && e.key === 'Escape') {
+      closeModal();
+    }
+  });
+
+  // 👉 SAVE (update place)
+  modalSave.onclick = async () => {
+    const placeId = editBtn.dataset.placeId;
+
+    const body = {
+      title: modalTitle.value.trim(),
+      description: modalDescription.value.trim(),
+      price: parseFloat(modalPrice.value),
+      city: modalCity.value.trim(),
+      country: modalCountry.value.trim(),
+      max_guests: parseInt(modalGuests.value, 10)
+    };
+
+    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (response.ok) {
+      closeModal();
+      location.reload();
+    } else {
+      alert('Failed to update place');
+    }
+  };
+
+  // 👉 DELETE place
+  modalDelete.onclick = async () => {
+    const placeId = editBtn.dataset.placeId;
+
+    if (!confirm('Delete this place?')) return;
+
+    const response = await fetch(`http://127.0.0.1:5000/api/v1/places/${placeId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      window.location.href = 'index.html';
+    } else {
+      alert('Failed to delete place');
+    }
+  };
+}
+
+function initReviewActions(place, currentUser) {
   // Active la modale d'édition uniquement pour les reviews autorisées.
   const token = getCookie('token');
   if (!token) return;

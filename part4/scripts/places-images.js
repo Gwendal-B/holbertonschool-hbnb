@@ -19,7 +19,7 @@ function getPhotosForPlace(place) {
     ];
   }
 
-  if (name.includes('studio cosy au coeur de paris')) {
+  if (name.includes('cozy studio in the heart of paris')) {
     return [
       'images/places/studio-cosy-paris/1.jpg',
       'images/places/studio-cosy-paris/2.jpg',
@@ -27,7 +27,7 @@ function getPhotosForPlace(place) {
     ];
   }
 
-  if (name.includes('villa avec piscine vue mer') || name.includes('nice')) {
+  if (name.includes('villa with pool and sea view') || name.includes('nice')) {
     return [
       'images/places/villa-nice/1.jpg',
       'images/places/villa-nice/2.jpg',
@@ -35,7 +35,7 @@ function getPhotosForPlace(place) {
     ];
   }
 
-  if (name.includes('appartement haussmannien bordeaux')) {
+  if (name.includes('haussmannian apartment')) {
     return [
       'images/places/bordeaux/1.jpg',
       'images/places/bordeaux/2.jpg',
@@ -43,7 +43,7 @@ function getPhotosForPlace(place) {
     ];
   }
 
-  if (name.includes('chalet au pied des pistes') || name.includes('chamonix')) {
+  if (name.includes('Chalet at the foot of the slopes') || name.includes('chamonix')) {
     return [
       'images/places/chamonix/1.jpg',
       'images/places/chamonix/2.jpg',
@@ -51,7 +51,7 @@ function getPhotosForPlace(place) {
     ];
   }
 
-  if (name.includes('loft industriel design') || name.includes('vieux lyon')) {
+  if (name.includes('designer industrial loft') || name.includes('vieux lyon')) {
     return [
       'images/places/loft-lyon/1.jpg',
       'images/places/loft-lyon/2.jpg',
@@ -59,7 +59,7 @@ function getPhotosForPlace(place) {
     ];
   }
 
-  if (name.includes('maison bretonne bord de mer') && name.includes('quiberon')) {
+  if (name.includes('breton house by the sea') && name.includes('quiberon')) {
     return id.endsWith('2')
       ? [
           'images/places/quiberon-2/1.jpg',

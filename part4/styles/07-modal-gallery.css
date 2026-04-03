@@ -305,3 +305,149 @@
   background: #cf7d67;
   color: white;
 }
+
+.place-actions {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.edit-place-btn {
+  border: 1px solid #d7ddcc;
+  background: #fffdf8;
+  color: #2f3f32;
+  border-radius: 999px;
+  padding: 0.48rem 1rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.edit-place-btn:hover {
+  background: #f2eee3;
+  transform: translateY(-1px);
+}
+
+.place-modal.hidden {
+  display: none;
+}
+
+.place-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.place-modal.show {
+  opacity: 1;
+}
+
+.place-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.place-modal-content {
+  position: relative;
+  z-index: 10001;
+  width: min(92vw, 560px);
+  margin: 8vh auto 0;
+  background: #fffdf8;
+  border-radius: 18px;
+  padding: 1.4rem;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.25);
+  transform: scale(0.95);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.place-modal.show .place-modal-content {
+  transform: scale(1);
+}
+
+.place-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #4d5a4d;
+}
+
+.place-modal-title {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.place-modal-input,
+.place-modal-textarea {
+  width: 100%;
+  border: 1px solid #d8ddcf;
+  border-radius: 12px;
+  padding: 0.85rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  margin-bottom: 0.9rem;
+  background: white;
+}
+
+.place-modal-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.place-modal-actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.place-modal-save,
+.place-modal-delete {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.place-modal-save:hover,
+.place-modal-delete:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.place-modal-save {
+  background: #89a07d;
+  color: white;
+}
+
+.place-modal-delete {
+  background: #cf7d67;
+  color: white;
+}
+
+.place-modal-group {
+  margin-bottom: 0.9rem;
+}
+
+.place-modal-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  margin-bottom: 0.45rem;
+}
