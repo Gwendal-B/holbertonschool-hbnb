@@ -66,9 +66,23 @@ function getPhotosForPlace(place) {
         ];
   }
 
+  if (name.includes('groundskeeper') || name.includes('cabin')) {
+    return [
+      'images/places/woodland-cabin/1.jpg',
+      'images/places/woodland-cabin/2.jpg',
+      'images/places/woodland-cabin/3.jpg'
+    ];
+  }
+
+  if (name.includes('cave') || name.includes('misty')) {
+    return [
+      'images/places/hidden-cave/1.jpg',
+      'images/places/hidden-cave/2.jpg',
+      'images/places/hidden-cave/3.jpg'
+    ];
+  }
+
   return [
-    'images/places/default-place.jpg',
-    'images/places/default-place.jpg',
     'images/places/default-place.jpg'
   ];
 }
